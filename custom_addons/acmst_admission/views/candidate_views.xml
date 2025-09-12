@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="view_admissions_candidate_tree" model="ir.ui.view">
+            <field name="name">admissions.candidate.tree</field>
+            <field name="model">admissions.candidate</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="combined_university_id" string="University ID"/>
+                    <field name="base_university_id" string="FRM"/>
+                    <field name="program_id"/>
+                    <field name="academic_year_id"/>
+                    <field name="first_ar"/>
+                    <field name="second_ar"/>
+                    <field name="third_ar"/>
+                    <field name="fourth_ar"/>
+                    <field name="is_active"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="view_admissions_candidate_form" model="ir.ui.view">
+            <field name="name">admissions.candidate.form</field>
+            <field name="model">admissions.candidate</field>
+            <field name="arch" type="xml">
+                <form string="Candidate">
+                    <sheet>
+                        <group string="University ID">
+                            <field name="base_university_id"/>
+                            <field name="academic_year_id"/>
+                            <field name="combined_university_id" readonly="1"/>
+                        </group>
+                        <group string="Program">
+                            <field name="program_id"/>
+                            <field name="is_active"/>
+                            <field name="partner_id"/>
+                        </group>
+                        <group string="Contact">
+                            <field name="phone"/>
+                        </group>
+                        <notebook>
+                            <page string="Arabic Name">
+                                <group>
+                                    <field name="first_ar"/>
+                                    <field name="second_ar"/>
+                                    <field name="third_ar"/>
+                                    <field name="fourth_ar"/>
+                                </group>
+                            </page>
+                            <page string="English Name">
+                                <group>
+                                    <field name="first_en"/>
+                                    <field name="second_en"/>
+                                    <field name="third_en"/>
+                                    <field name="fourth_en"/>
+                                </group>
+                            </page>
+                            <page string="Details">
+                                <group>
+                                    <field name="dob"/>
+                                    <field name="national_id"/>
+                                </group>
+                                <group>
+                                    <field name="extra_json" widget="json"/>
+                                </group>
+                            </page>
+                        </notebook>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="view_admissions_candidate_search" model="ir.ui.view">
+            <field name="name">admissions.candidate.search</field>
+            <field name="model">admissions.candidate</field>
+            <field name="arch" type="xml">
+                <search>
+                    <field name="program_id"/>
+                    <field name="academic_year_id"/>
+                    <field name="import_job_id"/>
+                </search>
+            </field>
+        </record>
+    </data>
+</odoo>

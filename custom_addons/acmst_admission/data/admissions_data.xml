@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <record id="admissions_year_2024" model="admissions.year">
+            <field name="code">2024</field>
+            <field name="label">2024/2025</field>
+            <field name="is_current">True</field>
+        </record>
+
+        <record id="admissions_default_settings" model="admissions.settings">
+            <field name="otp_length">6</field>
+            <field name="otp_ttl_minutes">10</field>
+            <field name="rate_limit_window_minutes">15</field>
+            <field name="rate_limit_sends_per_window">3</field>
+            <field name="rate_limit_daily_sends">10</field>
+            <field name="verify_attempts_per_code">5</field>
+            <field name="id_comp_rule">{{ base }}{{ year }}</field>
+        </record>
+    </data>
+</odoo>
+

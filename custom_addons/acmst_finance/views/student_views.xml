@@ -1,0 +1,88 @@
+<odoo>
+    <record id="view_acmst_student_tree" model="ir.ui.view">
+        <field name="name">acmst.student.tree</field>
+        <field name="model">acmst.student</field>
+        <field name="arch" type="xml">
+            <tree string="Students">
+                <field name="frmno"/>
+                <field name="full_name"/>
+                <field name="national_id"/>
+                <field name="sex"/>
+                <field name="year"/>
+                <field name="university"/>
+                <field name="partner_id"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_acmst_student_form" model="ir.ui.view">
+        <field name="name">acmst.student.form</field>
+        <field name="model">acmst.student</field>
+        <field name="arch" type="xml">
+            <form string="Student">
+                <header>
+        <button name="action_create_partner" string="Create Contact" type="object"
+        class="btn-primary" invisible="partner_id"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="frmno"/>
+                            <field name="fac"/>
+                            <field name="univ_id"/>
+                            <field name="sex"/>
+                            <field name="year"/>
+                        </group>
+                        <group>
+                            <field name="n1"/>
+                            <field name="n2"/>
+                            <field name="n3"/>
+                            <field name="n4"/>
+                            <field name="full_name" readonly="1"/>
+                        </group>
+                    </group>
+                    <group>
+                        <group>
+                            <field name="scname"/>
+                            <field name="gobno"/>
+                            <field name="facname"/>
+                            <field name="gobols"/>
+                        </group>
+                        <group>
+                            <field name="national_id"/>
+                            <field name="university"/>
+                            <field name="partner_id"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_acmst_students" model="ir.actions.act_window">
+    <field name="name">Students</field>
+    <field name="res_model">acmst.student</field>
+    <field name="view_mode">tree,form</field>
+    <field name="help" type="html">
+        <p>Use the "Upload Excel" to import candidates.</p>
+    </field>
+
+</record>
+
+    <record id="view_acmst_student_tree_buttons" model="ir.ui.view">
+    <field name="name">acmst.student.tree.buttons</field>
+    <field name="model">acmst.student</field>
+    <field name="inherit_id" ref="view_acmst_student_tree"/>
+    <field name="arch" type="xml">
+        <xpath expr="//tree" position="inside">
+            <header>
+                <!-- module prefix is safe & explicit -->
+                <button name="%(acmst_finance.action_student_import_wizard)d"
+                        type="action"
+                        string="Upload Excel"
+                        class="oe_highlight"/>
+            </header>
+        </xpath>
+    </field>
+    </record>
+</odoo>

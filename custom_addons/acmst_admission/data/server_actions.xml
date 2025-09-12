@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+  <data noupdate="1">
+    <record id="server_action_recompute_combined_id" model="ir.actions.server">
+      <field name="name">Recompute Admissions University IDs</field>
+      <field name="model_id" ref="model_admissions_candidate"/>
+      <field name="state">code</field>
+      <field name="code">action = env['admissions.candidate']._recompute_store(['combined_university_id'])</field>
+    </record>
+  </data>
+</odoo>

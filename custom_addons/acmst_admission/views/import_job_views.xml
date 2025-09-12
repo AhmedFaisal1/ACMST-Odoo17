@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+  <data>
+    <record id="view_admissions_import_job_tree" model="ir.ui.view">
+      <field name="name">admissions.import.job.tree</field>
+      <field name="model">admissions.import.job</field>
+      <field name="arch" type="xml">
+        <tree>
+          <field name="create_date"/>
+          <field name="filename"/>
+          <field name="state"/>
+          <field name="total"/>
+          <field name="processed"/>
+          <field name="imported"/>
+          <field name="rejected"/>
+        </tree>
+      </field>
+    </record>
+    <record id="view_admissions_import_job_form" model="ir.ui.view">
+      <field name="name">admissions.import.job.form</field>
+      <field name="model">admissions.import.job</field>
+      <field name="arch" type="xml">
+        <form string="Import Job">
+          <sheet>
+            <group>
+              <field name="filename"/>
+              <field name="state"/>
+              <field name="mapping_json"/>
+              <field name="total"/>
+              <field name="processed"/>
+              <field name="imported"/>
+              <field name="rejected"/>
+            </group>
+            <group>
+              <field name="errors_csv" filename="errors_csv_filename"/>
+              <field name="errors_csv_filename"/>
+            </group>
+            <group>
+              <field name="log" widget="text"/>
+            </group>
+          </sheet>
+          <div class="oe_button_box" name="button_box">
+            <button type="action" name="%(acmst_admission.action_admissions_candidates)d" class="oe_stat_button" icon="fa-users" string="Candidates"/>
+          </div>
+          <footer>
+            <button name="action_process_now" type="object" string="Process Now" class="btn-primary"/>
+            <button name="action_cancel" type="object" string="Cancel" class="btn-secondary"/>
+            <button type="action" name="%(acmst_admission.action_admissions_candidates)d" string="Open Candidates" class="btn-link"/>
+          </footer>
+        </form>
+      </field>
+    </record>
+    <record id="action_admissions_import_jobs" model="ir.actions.act_window">
+      <field name="name">Import Jobs</field>
+      <field name="res_model">admissions.import.job</field>
+      <field name="view_mode">tree,form</field>
+    </record>
+    <menuitem id="menu_admissions_import_jobs" name="Import Jobs"
+              parent="acmst_admission.menu_admissions_root" action="action_admissions_import_jobs" sequence="6"
+              groups="acmst_admission.group_admissions_admin,acmst_admission.group_admissions_officer,base.group_system"/>
+  </data>
+</odoo>

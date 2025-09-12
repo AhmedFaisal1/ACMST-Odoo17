@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="view_admissions_settings_tree" model="ir.ui.view">
+            <field name="name">admissions.settings.tree</field>
+            <field name="model">admissions.settings</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="id_comp_rule"/>
+                    <field name="otp_length"/>
+                    <field name="otp_ttl_minutes"/>
+                    <field name="rate_limit_sends_per_window"/>
+                    <field name="rate_limit_daily_sends"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="view_admissions_settings_form" model="ir.ui.view">
+            <field name="name">admissions.settings.form</field>
+            <field name="model">admissions.settings</field>
+            <field name="arch" type="xml">
+                <form string="Admissions Settings">
+                    <sheet>
+                        <group string="University ID">
+                            <field name="id_comp_rule" placeholder="e.g., {{ base }}{{ year }}"/>
+                        </group>
+                        <group string="OTP">
+                            <field name="otp_length"/>
+                            <field name="otp_ttl_minutes"/>
+                            <field name="verify_attempts_per_code"/>
+                        </group>
+                        <group string="Rate Limits">
+                            <field name="rate_limit_window_minutes"/>
+                            <field name="rate_limit_sends_per_window"/>
+                            <field name="rate_limit_daily_sends"/>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+    </data>
+</odoo>
+

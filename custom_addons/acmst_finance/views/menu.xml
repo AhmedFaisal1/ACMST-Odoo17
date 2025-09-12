@@ -1,0 +1,33 @@
+<odoo>
+    <!-- Action for Invoices menu -->
+    <record id="action_acmst_invoices" model="ir.actions.act_window">
+        <field name="name">Invoices</field>
+        <field name="res_model">account.move</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[('move_type','=','out_invoice')]</field>
+        <field name="context">{'default_move_type': 'out_invoice'}</field>
+    </record>
+
+    <!-- Root -->
+    <menuitem id="menu_acmst_root" name="ACMST Finance" sequence="10"/>
+
+    <!-- Students -->
+    <menuitem id="menu_acmst_students" name="Students"
+              parent="menu_acmst_root" sequence="10"
+              action="action_acmst_students"/>
+
+    <!-- Payments (enrollments) -->
+    <menuitem id="menu_acmst_enrollments" name="Payments"
+              parent="menu_acmst_root" sequence="20"
+              action="action_acmst_enrollments"/>
+
+    <!-- Invoices (now valid) -->
+    <menuitem id="menu_acmst_invoices" name="Invoices"
+              parent="menu_acmst_root" sequence="30"
+              action="action_acmst_invoices"/>
+
+    <!-- Upload Excel -->
+    <menuitem id="menu_acmst_student_import" name="Upload Excel"
+              parent="menu_acmst_root" sequence="15"
+              action="acmst_finance.action_student_import_wizard"/>
+</odoo>
