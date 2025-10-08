@@ -1,0 +1,3 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_study_field_option,access_study_field_option,model_acmst_study_field_option,base.group_user,1,1,1,1
+access_student_study_fields,access_student_study_fields,model_acmst_student_study_fields,base.group_user,1,1,1,1

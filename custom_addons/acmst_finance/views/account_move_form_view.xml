@@ -1,0 +1,17 @@
+<odoo>
+    <record id="view_move_form_inherit_acmst_bankak" model="ir.ui.view">
+        <field name="name">account.move.form.acmst.bankak</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="account.view_move_form"/>
+        <field name="arch" type="xml">
+            <!-- put them in the Other Info tab; choose any spot you like -->
+            <xpath expr="//page[@name='other_info']/group" position="inside">
+                <group string="Bankak">
+                    <field name="bankak_pay_date"/>
+                    <field name="bankak_receipt" filename="bankak_receipt_filename" widget="image"/>
+                    <field name="bankak_receipt_filename" invisible="1"/>
+                </group>
+            </xpath>
+        </field>
+    </record>
+</odoo>

@@ -1,0 +1,6 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_acmst_acceptance_form_user,acmst.acceptance.form.user,model_acmst_acceptance_form,base.group_user,1,1,1,0
+access_acmst_acceptance_form_manager,acmst.acceptance.form.manager,model_acmst_acceptance_form,base.group_system,1,1,1,1
+access_acmst_acceptance_guardian_user,acmst.acceptance.guardian.user,model_acmst_acceptance_guardian,base.group_user,1,1,1,0
+access_acmst_acceptance_guardian_manager,acmst.acceptance.guardian.manager,model_acmst_acceptance_guardian,base.group_system,1,1,1,1
+

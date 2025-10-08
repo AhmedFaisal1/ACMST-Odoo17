@@ -1,0 +1,10 @@
+<odoo>
+  <!-- App root -->
+  <menuitem id="menu_acmst_root" name="ACMST Finance" sequence="10"/>
+
+  <!-- Keep ONLY Students + Upload Excel in ACMST -->
+  <menuitem id="menu_acmst_students" name="Students" parent="menu_acmst_root" sequence="10" action="action_acmst_students"/>
+
+  <menuitem id="menu_acmst_student_import" name="Upload Excel" parent="menu_acmst_root" sequence="20" action="acmst_finance.action_student_import_wizard"/>
+
+</odoo>

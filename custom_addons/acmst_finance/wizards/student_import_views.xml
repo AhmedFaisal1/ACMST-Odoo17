@@ -1,0 +1,33 @@
+<odoo>
+    <record id="view_student_import_wizard_form" model="ir.ui.view">
+        <field name="name">acmst.student.import.wizard.form</field>
+        <field name="model">acmst.student.import.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Import Students">
+                <group>
+                    <field name="file" filename="filename"/>
+                    <field name="filename" invisible="1"/>
+                </group>
+                <footer>
+                    <button string="Import" type="object" name="action_import" class="btn-primary"/>
+                    <button special="cancel" string="Cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+<record id="action_student_import_wizard" model="ir.actions.act_window">
+    <field name="name">Upload Excel</field>
+    <field name="res_model">acmst.student.import.wizard</field>
+    <field name="view_mode">form</field>
+    <field name="view_id" ref="view_student_import_wizard_form"/>
+    <field name="target">new</field>
+
+    <!-- v17 bindings (fine to keep even if we add a menu) -->
+    <field name="binding_model_id" ref="model_acmst_student"/>
+    <field name="binding_view_types">list</field>
+    <field name="binding_type">action</field>
+</record>
+
+
+</odoo>

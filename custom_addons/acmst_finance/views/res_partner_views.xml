@@ -1,0 +1,30 @@
+<odoo>
+  <!-- Search view: add a “Students” quick filter -->
+  <record id="view_res_partner_filter_students" model="ir.ui.view">
+    <field name="name">res.partner.search.acmst.students</field>
+    <field name="model">res.partner</field>
+    <field name="inherit_id" ref="base.view_res_partner_filter"/>
+    <field name="arch" type="xml">
+      <xpath expr="//search" position="inside">
+        <filter name="acmst_students" string="Students" domain="[('is_student','=', True)]"/>
+      </xpath>
+    </field>
+  </record>
+
+  <!-- Partner form: show student fields -->
+  <record id="view_partner_form_inherit_acmst" model="ir.ui.view">
+    <field name="name">res.partner.form.inherit.acmst</field>
+    <field name="model">res.partner</field>
+    <field name="inherit_id" ref="base.view_partner_form"/>
+    <field name="arch" type="xml">
+      <!-- Insert a dedicated "Student" group after the first group -->
+      <xpath expr="//sheet//group" position="after">
+        <group string="Student">
+          <field name="is_student"/>
+          <field name="university_id"/>
+          <field name="student_year"/>
+        </group>
+      </xpath>
+    </field>
+  </record>
+</odoo>

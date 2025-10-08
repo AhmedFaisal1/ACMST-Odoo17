@@ -1,0 +1,183 @@
+<odoo>    <!-- Paperformat: A4 portrait, small margins, force PDF -->
+    <record id="paperformat_acmst_student" model="report.paperformat">
+        <field name="name">ACMST Student Invoice A4</field>
+        <field name="format">A4</field>
+        <field name="page_height">0</field>
+        <field name="page_width">0</field>
+        <field name="orientation">Portrait</field>
+        <field name="margin_top">15</field>
+        <field name="margin_bottom">15</field>
+        <field name="margin_left">15</field>
+        <field name="margin_right">15</field>
+        <field name="header_line" eval="False"/>
+        <field name="header_spacing">0</field>
+        <field name="dpi">96</field>
+    </record>    <!-- Report action -->
+    <record id="report_student_invoice_action" model="ir.actions.report">
+        <field name="name">Student Invoice</field>
+        <field name="model">account.move</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">acmst_finance.report_student_invoice</field>
+        <field name="paperformat_id" ref="acmst_finance.paperformat_acmst_student"/>
+        <field name="print_report_name"> (object.name or 'Invoice') + ' - ' + (object.partner_id.name or 'Student') </field>
+    </record>    <!-- HTML preview action for in-browser view -->
+    <record id="report_student_invoice_action_html" model="ir.actions.report">
+        <field name="name">Student Invoice (Preview)</field>
+        <field name="model">account.move</field>
+        <field name="report_type">qweb-html</field>
+        <field name="report_name">acmst_finance.report_student_invoice</field>
+        <field name="paperformat_id" ref="acmst_finance.paperformat_acmst_student"/>
+    </record>    <!-- QWeb template -->
+    <template id="report_student_invoice">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-call="web.external_layout">                    <!-- Force RTL for Arabic layout and use Cairo font -->
+                    <style> @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&amp;display=swap'); .acmst-rtl { direction: rtl; font-family: 'Cairo', 'DejaVu Sans', 'Arial', sans-serif; } .acmst-head td { vertical-align: top; } .acmst-title { text-align: center; font-family: 'Cairo', 'DejaVu Sans', 'Arial', sans-serif; font-weight: 800; font-size: 16pt; margin: 8px 0 4px; letter-spacing: .2px; } .acmst-sub { text-align: center; font-family: 'Cairo', 'DejaVu Sans', 'Arial', sans-serif; font-size: 11.5pt; margin-bottom: 12px; color:#444; } .acmst-box { border: 1px solid #333; padding: 8px 10px; margin: 6px 0; font-family: 'Cairo', 'DejaVu Sans', 'Arial', sans-serif; } .acmst-meta td { padding: 3px 6px; font-size: 10.5pt; white-space: nowrap; vertical-align: middle; } .acmst-value { display: inline-block; } .truncate { display: inline-block; max-width: 240px; overflow: hidden; text-overflow: ellipsis; vertical-align: middle; } .acmst-table { width:100%; border-collapse: collapse; margin-top: 8px; } .acmst-table th, .acmst-table td { border:1px solid #333; padding:6px 8px; font-size:10.5pt; } .acmst-right { text-align: right; } .acmst-left { text-align: left; } .acmst-center { text-align: center; } .acmst-foot { margin-top: 24px; display:flex; justify-content: space-between; } .acmst-stamp { width: 160px; height: 90px; border: none; } .acmst-label { color:#333; min-width: 120px; display:inline-block; } </style>
+                    <div class="acmst-rtl">                        <!-- Header (matches your PDF: Ministry / College / Dept + logo centered) -->
+                        <table class="acmst-head" style="width:100%;">
+                            <tr>
+                                <td class="acmst-right" style="width:33%;"> وزارة التعليم العالي والبحث العلمي                                    <br/>
+ كلية المدائن للعلوم الطبية والتكنلوجيا                                    <br/>
+ الإدارة المالية </td>
+                                <td class="acmst-center" style="width:33.33%;">
+                                    <img t-if="env.company.logo" t-att-src="'/web/image/res.company/%s/logo' % (env.company.id)" style="max-height:80px;"/>
+                                    <div class="acmst-title">فاتورة</div>
+                                    <div class="acmst-sub">ACMST — Invoice</div>
+                                </td>
+                                <td class="acmst-left" style="width:33.33%;"></td>
+                            </tr>
+
+                        </table>
+                        <div class="acmst-box">
+                            <table class="acmst-meta" style="width:100%;">
+                                <tr>
+                                    <td class="acmst-right">
+                                        <span class="acmst-label">رقم الفاتورة:</span>
+                                        <span t-esc="o.name"/>
+                                    </td>
+                                    <td class="acmst-right">
+                                        <span class="acmst-label">تاريخ الفاتورة:</span>
+                                        <span t-out="o.invoice_date" t-options='{"widget": "date"}'/>
+                                    </td>
+                                    <td class="acmst-right">
+                                        <span class="acmst-label">حالة:</span>
+                                        <t t-esc="dict(draft='مسودة', posted='مُرحلة', cancelled='ملغاة').get(o.state, o.state)"/>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="acmst-right">
+                                        <span class="acmst-label">الطالب:</span>
+                                        <span class="acmst-value truncate" t-esc="o.student_id.full_name or o.partner_id.name"/>
+                                    </td>
+                                    <td class="acmst-right">
+                                        <span class="acmst-label">الرقم الجامعي:</span>
+                                        <span class="acmst-value" t-esc="o.university_id or ''"/>
+                                    </td>
+                                    <td class="acmst-right" colspan="1">
+                                        <span class="acmst-label">السنة / المستوى:</span>
+                                        <span class="acmst-value" t-esc="(o.student_year or '')"/>
+                                        <t t-if="o.student_id.level"> /                                            <span class="acmst-value" t-esc="o.student_id.level"/>
+                                        </t>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="acmst-right" colspan="2">
+                                        <span class="acmst-label">حساب البنك باسم:</span>
+                                        <span t-esc="o.acmst_bank_account_label or ''"/>
+                                    </td>
+                                    <td class="acmst-right" colspan="1">
+                                        <span class="acmst-label">البرنامج:</span>
+                                        <t t-if="o.student_id">
+                                            <t t-if="o.student_id.fac and o.student_id.facname">
+                                                <span class="acmst-value" t-esc="o.student_id.facname"/>
+                                            </t>
+                                            <t t-if="not (o.student_id.fac and o.student_id.facname)">
+                                                <span class="acmst-value" t-esc="o.student_id.fac or o.student_id.facname or ''"/>
+                                            </t>
+                                        </t>
+                                    </td>                                    <!-- <td class="acmst-right"> <span class="acmst-label">نوع الدفع:</span> <span t-esc="o.acmst_payment_type or ''"/> </td> <td class="acmst-right"> <span class="acmst-label">رقم العملية:</span> <span t-esc="o.transaction_number or ''"/> </td> --></tr>
+                            </table>
+                        </div>                        <!-- Lines -->
+                        <table class="acmst-table">
+                            <thead>
+                                <tr>
+                                    <th class="acmst-center" style="width:6%;">#</th>
+                                    <th class="acmst-center">الوصف</th>
+                                    <th class="acmst-center" style="width:10%;">الكمية</th>
+                                    <th class="acmst-center" style="width:14%;">السعر</th>
+                                    <th class="acmst-center" style="width:14%;">الإجمالي</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <t t-set="i" t-value="1"/>
+                                <t t-foreach="o.invoice_line_ids.filtered(lambda l: not l.display_type)" t-as="l">
+                                    <tr>
+                                        <td class="acmst-center" t-esc="i"/>
+                                        <td class="acmst-right">
+                                            <span t-esc="l.name"/>
+                                        </td>
+                                        <td class="acmst-center" t-esc="l.quantity"/>
+                                        <td class="acmst-center">
+                                            <span t-out="l.price_unit" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
+                                        </td>
+                                        <td class="acmst-center">
+                                            <span t-out="l.price_subtotal" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
+                                        </td>
+                                    </tr>
+                                    <t t-set="i" t-value="i+1"/>
+                                </t>
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <th colspan="4" class="acmst-right">الإجمالي قبل الضريبة</th>
+                                    <td class="acmst-center">
+                                        <span t-out="o.amount_untaxed" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th colspan="4" class="acmst-right">الضريبة</th>
+                                    <td class="acmst-center">
+                                        <span t-out="o.amount_tax" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th colspan="4" class="acmst-right">الإجمالي النهائي</th>
+                                    <td class="acmst-center">
+                                        <span t-out="o.amount_total" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th colspan="4" class="acmst-right">المدفوع</th>
+                                    <td class="acmst-center">
+                                        <span t-out="o.amount_total - o.amount_residual" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th colspan="4" class="acmst-right">المتبقي</th>
+                                    <td class="acmst-center">
+                                        <span t-out="o.amount_residual" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
+                                    </td>
+                                </tr>
+                            </tfoot>
+                        </table>                        <!-- Footer (signature / stamp placeholders) -->
+                        <t t-set="base_url" t-value="env['ir.config_parameter'].sudo().get_param('web.base.url') or ''"/>
+                        <div class="acmst-foot">
+                            <div>
+                                <div> اسم الموظف:                                    <span t-esc="(o.invoice_user_id and o.invoice_user_id.name) or (o.create_uid and o.create_uid.name) or env.user.name"/>
+                                </div>
+                                <div style="margin-top:8px;"> التوقيع:                                    <span t-if="env.company.acmst_signature_invoice">
+                                        <img t-att-src="'/web/image/res.company/%s/acmst_signature_invoice' % (env.company.id)" style="max-height:70px; margin-right:8px;"/>
+                                    </span>
+                                    <span t-if="not env.company.acmst_signature_invoice">____________________</span>
+                                </div>
+                            </div>
+                            <div t-if="env.company.acmst_college_stamp" class="acmst-stamp" style="text-align:center;">
+                                <img t-att-src="'/web/image/res.company/%s/acmst_college_stamp' % (env.company.id)" alt="Stamp" style="max-height:120px;"/>
+                            </div>
+                        </div>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+</odoo>

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+  <!-- Inherit Payment Receipt report to show Transaction Number and Journal/Account -->
+  <template id="report_payment_receipt_inherit_acmst" inherit_id="account.report_payment_receipt_document">
+    <xpath expr="//div[@class='mb-4 mt-3']" position="inside">
+      <div class="row">
+        <div class="col-6" t-if="o.payment_reference or o.ref">
+          <span>Transaction Number:</span>
+          <span t-out="o.payment_reference or o.ref"></span>
+        </div>
+        <div class="col-6">
+          <span>Journal:</span>
+          <span t-field="o.journal_id"/>
+          <t t-if="o.outstanding_account_id">
+            <span> — Account:</span>
+            <span t-field="o.outstanding_account_id"/>
+          </t>
+        </div>
+      </div>
+    </xpath>
+  </template>
+</odoo>

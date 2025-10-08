@@ -1,0 +1,51 @@
+/* Latin (Century) */
+@font-face {
+  font-family: "ACMSTAlmarai";
+  src: url("/acmst_finance/static/src/fonts/Century-Regular.ttf")
+    format("truetype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "ACMSTAlmarai";
+  src: url("/acmst_finance/static/src/fonts/Century-Bold.ttf")
+    format("truetype");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Arabic (Almarai) — بدون unicode-range لضمان تضمينها في PDF */
+@font-face {
+  font-family: "ACMSTAlmarai";
+  src: url("/acmst_finance/static/src/fonts/Almarai-Light.ttf")
+    format("truetype");
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "ACMSTAlmarai";
+  src: url("/acmst_finance/static/src/fonts/Almarai-Regular.ttf")
+    format("truetype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "ACMSTAlmarai";
+  src: url("/acmst_finance/static/src/fonts/Almarai-Bold.ttf")
+    format("truetype");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "ACMSTAlmarai";
+  src: url("/acmst_finance/static/src/fonts/Almarai-ExtraBold.ttf")
+    format("truetype");
+  font-weight: 800;
+  font-style: normal;
+  font-display: swap;
+}

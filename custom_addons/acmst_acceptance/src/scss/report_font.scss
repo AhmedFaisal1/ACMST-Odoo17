@@ -1,0 +1,133 @@
+/* ===== ACMST Report Polish Pack ===== */
+$brand: #10b981; /* أخضر قريب من هوية ACMST */
+$ink: #111827; /* نص رئيسي */
+$muted: #6b7280; /* نص ثانوي */
+$line: #e5e7eb; /* حدود خفيفة */
+$bg: #f9fafb; /* خلفية خفيفة */
+$bg2: #f0faf4; /* خلفية رأس الجدول */
+body,
+.form-container,
+.section-card,
+.field-label,
+.field-value,
+.header-title {
+  font-family: "ACMSTAlmarai", "DejaVu Sans", sans-serif !important;
+}
+
+/* صفحة */
+.acmst-doc {
+  color: $ink;
+  font-size: 11pt;
+  line-height: 1.5;
+}
+
+.acmst-title {
+  font-weight: 800; /* Almarai ExtraBold */
+  font-size: 16pt;
+  margin: 2pt 0 4pt;
+  text-align: center;
+}
+.acmst-subtitle {
+  color: $muted;
+  font-size: 10pt;
+  text-align: center;
+  margin-bottom: 10pt;
+}
+
+/* كارد البيانات العلوية */
+.acmst-meta {
+  border: 1px solid $line;
+  border-radius: 6pt;
+  padding: 8pt;
+  margin: 8pt 0 12pt;
+  background: #fff;
+  page-break-inside: avoid;
+}
+.acmst-meta table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.acmst-meta td {
+  padding: 3pt 6pt;
+  vertical-align: top;
+  font-size: 10.5pt;
+}
+.acmst-meta .label {
+  color: $muted;
+  white-space: nowrap;
+}
+.acmst-meta .value {
+  font-weight: 600;
+}
+
+/* جدول السطور */
+table.acmst-table {
+  width: 100%;
+  border-collapse: collapse;
+  page-break-inside: auto;
+  border: 1px solid $line;
+  border-radius: 6pt;
+  overflow: hidden;
+}
+.acmst-table thead th {
+  background: $bg2;
+  color: #065f46; /* أخضر داكن */
+  font-weight: 700;
+  padding: 6pt 8pt;
+  border: 1px solid $line;
+  text-align: center;
+}
+.acmst-table tbody td {
+  border: 1px solid $line;
+  padding: 6pt 8pt;
+}
+.acmst-table tbody tr:nth-child(even) td {
+  background: $bg;
+}
+
+.acmst-table .numeric {
+  text-align: right; /* محاذاة القيم */
+  direction: ltr; /* لضبط الفاصلة العشرية */
+  unicode-bidi: plaintext;
+  font-variant-numeric: tabular-nums; /* إذا دعمه المحرك */
+}
+
+/* سطر الإجمالي/المتبقي */
+.acmst-table tfoot td,
+.acmst-table .total-row td {
+  background: #ecfdf5;
+  border-top: 2px solid #a7f3d0;
+  font-weight: 700;
+}
+
+/* توقيعات أسفل الصفحة */
+.acmst-signatures {
+  margin-top: 16pt;
+  display: table;
+  width: 100%;
+}
+.acmst-signature {
+  display: table-cell;
+  width: 50%;
+  padding-top: 10pt;
+  text-align: center;
+}
+.acmst-signature .line {
+  margin: 14pt 24pt 6pt;
+  border-top: 1px dashed $line;
+  height: 0;
+}
+.acmst-signature .label {
+  color: $muted;
+  font-size: 10pt;
+}
+
+/* منع التفكك عبر الصفحات */
+.avoid-break {
+  page-break-inside: avoid;
+}
+.arabic {
+  direction: rtl;
+  text-align: right;
+  font-family: "ACMSTAlmarai", sans-serif !important;
+}

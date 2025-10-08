@@ -1,0 +1,17 @@
+# Optional custom Odoo image with wkhtmltopdf and Arabic fonts
+FROM odoo:17
+
+USER root
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    fontconfig fonts-dejavu fonts-dejavu-core fonts-dejavu-extra \
+    fonts-noto fonts-noto-cjk fonts-noto-color-emoji \
+    wget xfonts-75dpi xfonts-base \
+ && rm -rf /var/lib/apt/lists/*
+
+# wkhtmltopdf (0.12.6) static build
+RUN set -eux; \
+    wget -O /tmp/wk.deb https://github.com/wkhtmltopdf/packaging/releases/download/0.12.6-1/wkhtmltox_0.12.6-1.focal_amd64.deb; \
+    apt-get update && apt-get install -y --no-install-recommends /tmp/wk.deb && rm -rf /var/lib/apt/lists/* /tmp/wk.deb
+
+USER odoo
+

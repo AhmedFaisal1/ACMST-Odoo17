@@ -1,0 +1,40 @@
+html,
+body,
+.o_web_client {
+  font-family: "ACMSTAlmarai", "DejaVu Sans", Arial, sans-serif;
+}
+[dir="rtl"],
+:lang(ar) {
+  font-family: "ACMSTAlmarai", "DejaVu Sans", Arial, sans-serif !important;
+}
+@font-face {
+  font-family: "ACMSTAlmarai";
+  src: url("/acmst_finance/static/src/fonts/Almarai-Regular.ttf")
+    format("truetype");
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "ACMSTAlmarai";
+  src: url("/acmst_finance/static/src/fonts/Almarai-Bold.ttf")
+    format("truetype");
+  font-weight: bold;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "ACMSTAlmarai";
+  src: url("/acmst_finance/static/src/fonts/Almarai-Light.ttf")
+    format("truetype");
+  font-weight: 300;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "ACMSTAlmarai";
+  src: url("/acmst_finance/static/src/fonts/Almarai-ExtraBold.ttf")
+    format("truetype");
+  font-weight: 800;
+  font-style: normal;
+}

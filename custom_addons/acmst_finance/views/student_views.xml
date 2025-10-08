@@ -1,0 +1,139 @@
+<odoo>
+  <!-- Tree -->
+  <record id="view_acmst_student_tree" model="ir.ui.view">
+    <field name="name">acmst.student.tree</field>
+    <field name="model">acmst.student</field>
+    <field name="arch" type="xml">
+      <tree string="Students">
+        <field name="frmno"/>
+        <field name="full_name"/>
+        <field name="national_id"/>
+        <field name="sex"/>
+        <field name="year"/>
+        <field name="level"/>
+        <field name="academic_year"/>
+        <field name="university"/>
+        <field name="partner_id"/>
+      </tree>
+    </field>
+  </record>
+
+  <!-- Form with oe_title, header buttons, smart button, chatter -->
+  <record id="view_acmst_student_form" model="ir.ui.view">
+    <field name="name">acmst.student.form</field>
+    <field name="model">acmst.student</field>
+    <field name="arch" type="xml">
+      <form string="Student">
+        <header>
+          <!-- visible only when NO partner yet -->
+          <button name="action_create_partner" string="Create Contact" type="object" class="btn-primary" invisible="partner_id"/>
+
+          <!-- visible when partner exists -->
+          <button name="action_generate_invoice" string="Generate Invoice" type="object" class="oe_highlight" invisible="not partner_id" groups="account.group_account_invoice"/>
+
+          <!-- visible when there is at least one invoice -->
+          <button name="action_pay_latest_invoice" string="Pay the Invoice" type="object" invisible="not invoice_count" groups="account.group_account_invoice"/>
+
+          <!-- admin-only -->
+          <button name="action_grant_portal_access" string="Grant Portal Access" type="object" invisible="not partner_id" groups="base.group_system"/>
+        </header>
+
+        <div class="oe_button_box" name="button_box">
+          <button type="object" name="action_view_invoices" class="oe_stat_button" icon="fa-file-text-o">
+            <field name="invoice_count" widget="statinfo" string="Invoices"/>
+          </button>
+        </div>
+
+        <sheet>
+          <div class="oe_title">
+            <h1>
+              <field name="full_name" readonly="1"/>
+            </h1>
+            <h2 class="o_subtitle">
+              <span>University ID:</span>
+              <field name="frmno" readonly="1" class="oe_inline"/>
+            </h2>
+          </div>
+
+          <group>
+            <group>
+              <field name="frmno"/>
+              <field name="fac"/>
+              <field name="univ_id"/>
+              <field name="sex"/>
+              <field name="year"/>
+              <field name="level"/>
+              <field name="academic_year"/>
+            </group>
+            <group>
+              <field name="n1"/>
+              <field name="n2"/>
+              <field name="n3"/>
+              <field name="n4"/>
+              <field name="full_name" readonly="1"/>
+            </group>
+          </group>
+
+          <group>
+            <group>
+              <field name="scname"/>
+              <field name="gobno"/>
+              <field name="facname"/>
+              <field name="gobols"/>
+            </group>
+            <group>
+              <field name="national_id"/>
+              <field name="university"/>
+              <field name="partner_id"/>
+            </group>
+          </group>
+
+          <notebook>
+            <page string="All Invoices">
+              <field name="invoice_ids" domain="[('move_type','=','out_invoice')]" context="{'student_invoice_ui': 1}">
+                <tree string="Student Invoices" create="0" edit="0">
+                  <field name="name" string="Invoice"/>
+                  <field name="invoice_date"/>
+                  <field name="amount_total"/>
+                  <field name="amount_residual" string="To Pay"/>
+                  <field name="state"/>
+                  <button name="action_preview_student_invoice_html" type="object" string="View" icon="fa-eye"/>
+                  <button name="action_print_student_invoice_pdf" type="object" string="Download" icon="fa-download"/>
+                </tree>
+              </field>
+            </page>
+            <page string="Receipts">
+              <field name="receipt_ids">
+                <tree string="Receipts" create="0" edit="0">
+                  <field name="name"/>
+                  <field name="date"/>
+                  <field name="journal_id"/>
+                  <field name="payment_method_id"/>
+                  <field name="amount"/>
+                  <field name="payment_reference" string="Transaction Number"/>
+                  <button name="action_preview_payment_receipt_html" type="object" string="View" icon="fa-eye"/>
+                  <button name="action_print_payment_receipt_pdf" type="object" string="Download" icon="fa-download"/>
+                </tree>
+              </field>
+            </page>
+          </notebook>
+        </sheet>
+
+        <div class="oe_chatter">
+          <field name="message_follower_ids" widget="mail_followers"/>
+          <field name="activity_ids" widget="mail_activity"/>
+          <field name="message_ids" widget="mail_thread"/>
+        </div>
+      </form>
+    </field>
+  </record>
+
+  <record id="action_acmst_students" model="ir.actions.act_window">
+    <field name="name">Students</field>
+    <field name="res_model">acmst.student</field>
+    <field name="view_mode">tree,form</field>
+    <field name="help" type="html">
+      <p>Use the "Upload Excel" to import candidates.</p>
+    </field>
+  </record>
+</odoo>

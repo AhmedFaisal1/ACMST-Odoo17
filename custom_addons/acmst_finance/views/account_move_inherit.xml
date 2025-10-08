@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+  <!-- Action: Student Invoices (uses our custom form) -->
+  <record id="action_move_out_invoice_student" model="ir.actions.act_window">
+    <field name="name">Student Invoices</field>
+    <field name="res_model">account.move</field>
+    <field name="view_mode">tree,form</field>
+    <field name="domain">[("move_type", "=", "out_invoice")]</field>
+    <field name="context">
+      {
+        "default_move_type": "out_invoice",
+        "student_invoice_ui": 1
+      }
+    </field>
+  </record>
+
+  <!-- Custom Student Invoice form (standalone; not inheriting base form) -->
+  <record id="view_move_form_student_custom" model="ir.ui.view">
+    <field name="name">account.move.form.student.custom</field>
+    <field name="model">account.move</field>
+    <field name="type">form</field>
+    <field name="arch" type="xml">
+      <form string="Student Invoice">
+
+        <!-- Header with statebar and essential buttons -->
+        <header>
+          <button name="action_post" type="object" string="Confirm" class="btn-primary" invisible="state != 'draft' or move_type != 'out_invoice'"/>
+          <button name="button_draft" type="object" string="Reset to Draft" invisible="state != 'posted' or move_type != 'out_invoice'"/>
+          <button name="action_register_payment" type="object" string="Register Payment" class="btn-primary" invisible="state != 'posted' or move_type != 'out_invoice'"/>
+          <button name="action_preview_student_invoice_html" type="object" string="Preview" invisible="move_type != 'out_invoice'"/>
+          <button name="action_print_student_invoice_pdf" type="object" string="Download PDF" class="btn-secondary" invisible="move_type != 'out_invoice'"/>
+          <field name="state" widget="statusbar" statusbar_visible="draft,posted"/>
+        </header>
+
+        <sheet>
+          <group>
+            <group>
+
+              <!-- Required hidden fields for domains/defaults -->
+              <field name="company_id" invisible="1"/>
+              <field name="move_type" invisible="1"/>
+              <field name="currency_id" invisible="1"/>
+              <field name="suitable_journal_ids" invisible="1"/>
+
+              <!-- Student selector + linked partner (hidden) -->
+              <field name="student_id" string="Student"/>
+              <field name="partner_id" invisible="1"/>
+
+              <field name="university_id" readonly="1"/>
+              <field name="student_year" readonly="1"/>
+              <field name="student_level"/>
+              <field name="student_academic_year"/>
+              <field name="student_program"/>
+            </group>
+
+            <group>
+              <!-- Journal is kept visible; the domain avoids wrong journals -->
+              <field name="journal_id" domain="[('id', 'in', suitable_journal_ids)]"/>
+              <field name="invoice_date" string="Invoice/Bill Date"/>
+              <field name="transaction_number" string="Transaction Number"/>
+              <field name="student_payment_amount" string="Payment"/>
+              <field name="acmst_payment_type" string="Payment Type"/>
+            </group>
+          </group>
+
+          <notebook>
+            <page string="Other Info">
+              <group>
+                <field name="passport_scan" widget="binary" string="Passport Scan"/>
+                <field name="national_id_scan" widget="binary" string="National Id Scan"/>
+                <field name="acmst_gl_bank_account_id" string="Printed Bank Account" domain="[('account_type','=','asset_cash'), ('deprecated','=', False), ('company_id', '=', company_id)]"/>
+                <!-- Hidden base fields we do not use on this layout -->
+                <field name="narration" invisible="1"/>
+                <field name="ref" invisible="1"/>
+              </group>
+            </page>
+          </notebook>
+        </sheet>
+      </form>
+    </field>
+  </record>
+
+  <!-- Show Student on the standard Account Invoice form as well -->
+  <record id="view_move_form_inherit_add_student" model="ir.ui.view">
+    <field name="name">account.move.form.inherit.add.student</field>
+    <field name="model">account.move</field>
+    <field name="inherit_id" ref="account.view_move_form"/>
+    <field name="arch" type="xml">
+      <!-- Insert after partner/customer field -->
+      <xpath expr="//group[@id='header_left_group']/div[field[@name='partner_id']]" position="after">
+        <div class="o_col">
+          <field name="student_id" string="Student" options='{"no_open": True}' placeholder="Select student (optional)" invisible="move_type not in ('out_invoice','out_refund','out_receipt')"/>
+        </div>
+      </xpath>
+      <!-- Add Printed Bank Account field in the right header group (stable anchor) -->
+      <xpath expr="//group[@id='header_right_group']" position="inside">
+        <field name="partner_bank_id" string="Printed Bank Account" domain="[('company_id', '=', company_id)]" context="{'default_partner_id': company_id, 'default_company_id': company_id}" options="{'no_create_edit': False}"/>
+      </xpath>
+    </field>
+  </record>
+
+  <!-- Bind our custom form view to the Student Invoices action -->
+  <record id="action_move_out_invoice_student_view_form" model="ir.actions.act_window.view">
+    <field name="sequence">1</field>
+    <field name="view_mode">form</field>
+    <field name="view_id" ref="view_move_form_student_custom"/>
+    <field name="act_window_id" ref="action_move_out_invoice_student"/>
+  </record>
+
+  <!-- Use the default account.move tree for the action -->
+  <record id="action_move_out_invoice_student_view_tree" model="ir.actions.act_window.view">
+    <field name="sequence">0</field>
+    <field name="view_mode">tree</field>
+    <field name="act_window_id" ref="action_move_out_invoice_student"/>
+  </record>
+
+</odoo>

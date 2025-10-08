@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Sample Study Field Options -->
+    <record id="study_field_ai" model="acmst.study.field.option">
+        <field name="name">Artificial Intelligence (AI)</field>
+        <field name="code">AI</field>
+        <field name="active">True</field>
+    </record>
+
+    <record id="study_field_ds" model="acmst.study.field.option">
+        <field name="name">Data Science</field>
+        <field name="code">DS</field>
+        <field name="active">True</field>
+    </record>
+
+    <record id="study_field_web" model="acmst.study.field.option">
+        <field name="name">Web Development</field>
+        <field name="code">WEB</field>
+        <field name="active">True</field>
+    </record>
+
+    <record id="study_field_mobile" model="acmst.study.field.option">
+        <field name="name">Mobile Development</field>
+        <field name="code">MOBILE</field>
+        <field name="active">True</field>
+    </record>
+
+    <record id="study_field_cyber" model="acmst.study.field.option">
+        <field name="name">Cybersecurity</field>
+        <field name="code">CYBER</field>
+        <field name="active">True</field>
+    </record>
+
+    <record id="study_field_cloud" model="acmst.study.field.option">
+        <field name="name">Cloud Computing</field>
+        <field name="code">CLOUD</field>
+        <field name="active">True</field>
+    </record>
+</odoo>

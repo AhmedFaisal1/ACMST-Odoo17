@@ -1,0 +1,482 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+  <!-- Paperformat (اختياري عدّل الهوامش لاحقًا حسب رغبتك) -->
+  <record id="paperformat_acmst_student" model="report.paperformat">
+    <field name="name">ACMST Student Receipt A4</field>
+    <field name="format">A4</field>
+    <field name="orientation">Portrait</field>
+    <field name="margin_top">10</field>
+    <field name="margin_bottom">30</field>
+    <field name="margin_left">8</field>
+    <field name="margin_right">8</field>
+    <field name="header_spacing">6</field>
+  </record>
+
+  <!-- Override standard action to use our template + paperformat -->
+  <record id="account.action_report_payment_receipt" model="ir.actions.report">
+    <field name="report_name">acmst_finance.report_student_payment_receipt</field>
+    <field name="report_type">qweb-pdf</field>
+    <field name="paperformat_id" ref="acmst_finance.paperformat_acmst_student"/>
+  </record>
+
+  <!-- Optional HTML preview -->
+  <record id="report_student_payment_receipt_action_html" model="ir.actions.report">
+    <field name="name">Payment Receipt (Preview)</field>
+    <field name="model">account.payment</field>
+    <field name="report_type">qweb-html</field>
+    <field name="report_name">acmst_finance.report_student_payment_receipt</field>
+    <field name="paperformat_id" ref="acmst_finance.paperformat_acmst_student"/>
+  </record>
+
+  <!-- ===== Template (New Polished Design) ===== -->
+  <template id="report_student_payment_receipt">
+    <t t-call="web.html_container">
+      <t t-foreach="docs" t-as="o">
+        <t t-call="web.basic_layout">
+
+          <!-- ===== Styles (خفيفة ومتوافقة مع wkhtmltopdf) ===== -->
+          <style>
+            /* لوحة ألوان خفيفة */
+            .ac-brand { color:#065f46; }               /* النص الأخضر الداكن */
+            .ac-ink   { color:#111827; }
+            .ac-muted { color:#6b7280; }
+            .ac-line  { border-color:#e5e7eb !important; }
+            .ac-bg    { background:#f9fafb; }
+            .ac-bg2   { background:#f0faf4; }
+
+            /* هيكل عام */
+            .acmst-doc { direction: rtl; font-family: "ACMSTAlmarai","DejaVu Sans",Arial,sans-serif; font-size:11pt; line-height:1.5; color:#111827; }
+            .page { position: relative; min-height: 265mm; }
+            .avoid-break { page-break-inside: avoid; }
+
+            /* رأس المستند */
+            .ac-head{ width:100%; table-layout:fixed; border-collapse:collapse; }
+            .ac-head td{ vertical-align: top; padding:0; }
+            .ac-head .cell-right  { text-align:right; }
+            .ac-head .cell-center { text-align:center; }
+            .ac-head .cell-left   { text-align:left; }
+
+            /* تأكيد تمركز الشعار */
+            .ac-head .logo{ display:block; margin:0 auto; max-height:80px; }
+            .ac-title   { text-align:center; font-weight:800; font-size:16pt; margin:6pt 0 2pt; letter-spacing:.2px; }
+            .ac-sub     { text-align:center; font-weight:600; font-size:11pt; margin-bottom:10pt; color:#6b7280; }
+
+            /* كارد معلومات أعلى الصفحة */
+            .ac-card { border:1px solid #e5e7eb; border-radius:6pt; padding:8pt 10pt; margin:6pt 0 10pt; background:#fff; }
+            .ac-meta { table-layout:fixed; width:100%; border-collapse:collapse; }
+            .ac-meta td { padding:3pt 6pt; font-size:10.5pt; white-space:nowrap; vertical-align:middle; }
+            .ac-label { color:#6b7280; min-width:110px; display:inline-block; }
+            .ac-value { display:inline-block; font-weight:600; }
+            .ac-trunc  { display:inline-block; max-width:240px; overflow:hidden; text-overflow:ellipsis; vertical-align:middle; }
+
+            /* جدول التفاصيل */
+            table.ac-table { width:100%; border-collapse:collapse; border:1px solid #e5e7eb; border-radius:6pt; overflow:hidden; }
+            .ac-table thead th {
+              background:#f0faf4; color:#065f46; font-weight:700; padding:6pt 8pt; border:1px solid #e5e7eb; text-align:center;
+            }
+            .ac-table tbody td { border:1px solid #e5e7eb; padding:6pt 8pt; font-size:10.5pt; }
+            .ac-table tbody tr:nth-child(even) td { background:#f9fafb; }
+            .ac-num { text-align:right; direction:ltr; unicode-bidi:plaintext; font-variant-numeric:tabular-nums; }
+
+            /* صف الإجماليات/المتبقي */
+            .ac-total td { background:#ecfdf5; border-top:2px solid #a7f3d0; font-weight:700; }
+
+            /* شارة مدفوع اختيارية */
+            .ac-paid { margin:8pt 0; color:#059669; border:2pt solid #059669; display:inline-block; padding:2pt 10pt; border-radius:6pt; font-weight:700; }
+
+            /* إخفاء هيدر التخطيط الافتراضي إن وُجد */
+            .header, .o_clean_header, .o_background_header { display:none !important; }
+
+            /* تذييل مثبت لصفحات المرفقات */
+            .ac-fixed-footer {
+              position:absolute; bottom:0; left:0; right:0; width:100%;
+              border-top:1px solid #e5e7eb; padding-top:6pt;
+            }
+
+                      /* شارة حالة السداد داخل البطاقة */
+            .ac-badge{
+              display:inline-block;
+              padding: 2pt 12pt;
+              border-radius: 6pt;
+              font-weight: 700;
+              border: 2pt solid;
+              margin: 4pt 0 8pt;
+            }
+            .ac-badge.is-paid{
+              color: #059669;         /* أخضر */
+              border-color: #059669;
+            }
+            .ac-badge.is-partial{
+              color: #FF8C00;         /* برتقالي المطلوب */
+              border-color: #FF8C00;
+            }
+            .ac-badge.is-advance{
+              color:#0369a1; border-color:#0ea5e9;   /* اختياري لدفعة/سلفة */
+            }
+            .ac-badge-wrap{ display:block; text-align:center; margin-top:4pt; }
+
+          </style>
+
+          <!-- ===== الصفحة الأولى ===== -->
+          <div class="page">
+            <div class="acmst-doc">
+
+              <!-- رأس -->
+              <table class="ac-head">
+                <colgroup>
+                  <col style="width:33%"/>
+                  <col style="width:34%"/>
+                  <col style="width:33%"/>
+                </colgroup>
+                <tr>
+                  <td class="cell-right">
+                    وزارة التعليم العالي والبحث العلمي                    <br/>
+                    كلية المدائن للعلوم الطبية والتكنولوجيا                    <br/>
+                    الإدارة المالية
+                  </td>
+                  <td class="cell-center">
+                    <img class="logo" t-if="env.company.logo" t-att-src="'/web/image/res.company/%s/logo' % (env.company.id)" />
+                    <div class="ac-title">إيصال سداد</div>
+                    <div class="ac-sub">ACMST — Payment Receipt</div>
+
+                    <!-- حساب الحالة كما هو -->
+                    <t t-set="invoices" t-value="o.reconciled_invoice_ids or o.reconciled_bill_ids"/>
+                    <t t-set="has_invoices" t-value="bool(invoices)"/>
+                    <t t-set="all_paid" t-value="True"/>
+                    <t t-set="any_partial" t-value="False"/>
+                    <t t-foreach="invoices" t-as="inv">
+                      <t t-if="inv.amount_residual &gt; 0">
+                        <t t-set="all_paid" t-value="False"/>
+                        <t t-set="any_partial" t-value="True"/>
+                      </t>
+                    </t>
+
+                    <!-- ✅ الشارة كـ DIV داخل نفس الخلية -->
+                    <div class="ac-badge-wrap">
+                      <t t-if="has_invoices and all_paid">
+                        <div class="ac-badge is-paid">مُدفوع</div>
+                      </t>
+                      <t t-elif="has_invoices and any_partial">
+                        <div class="ac-badge is-partial">مدفوع جزئيًا</div>
+                      </t>
+                      <t t-elif="not has_invoices">
+                        <div class="ac-badge is-advance">دفعة/سلفة</div>
+                      </t>
+                    </div>
+                  </td>
+
+                  <td style="width:33%;"></td>
+                </tr>
+              </table>
+
+              <!-- بطاقة المعلومات -->
+              <div class="ac-card avoid-break">
+                <table class="ac-meta">
+                  <colgroup>
+                    <col style="width:50%"/>
+                    <col style="width:50%"/>
+                  </colgroup>
+
+                  <tr>
+                    <td style="text-align:right;">
+                      <span class="ac-label">رقم الإيصال:</span>
+                      <span class="ac-value" t-esc="o.name"/>
+                    </td>
+                    <td style="text-align:right;">
+                      <span class="ac-label">تاريخ الفاتورة:</span>
+                      <t t-set="inv" t-value="o.reconciled_invoice_ids and o.reconciled_invoice_ids[0]"/>
+                      <span class="ac-value" t-out="inv and inv.invoice_date or None" t-options='{"widget":"date"}'/>
+                    </td>
+                  </tr>
+
+                  <tr>
+                    <td style="text-align:right;">
+                      <span class="ac-label">الطالب:</span>
+                      <span class="ac-value ac-trunc" t-esc="(o.student_id and o.student_id.full_name) or (o.partner_id and o.partner_id.name) or ''"/>
+                    </td>
+                    <td style="text-align:right;">
+                      <span class="ac-label">عام القبول/المستوى:</span>
+                      <span class="ac-value" t-esc="o.student_year or ''"/>
+                      <t t-if="o.student_level"> /                        <span class="ac-value" t-esc="o.student_level"/>
+                      </t>
+                    </td>
+                  </tr>
+
+                  <tr>
+                    <td style="text-align:right;">
+                      <span class="ac-label">البرنامج:</span>
+                      <t t-if="o.student_id">
+                        <t t-if="o.student_id.fac and o.student_id.facname">
+                          <span class="ac-value" t-esc="o.student_id.facname"/>
+                        </t>
+                        <t t-if="not (o.student_id.fac and o.student_id.facname)">
+                          <span class="ac-value" t-esc="o.student_id.fac or o.student_id.facname or ''"/>
+                        </t>
+                      </t>
+                    </td>
+                    <td style="text-align:right;">
+                      <!-- <span class="ac-label">الرقم الجامعي:</span> -->
+                      <span class="ac-value" t-esc="o.student_id and o.student_id.frmno or ''"/>
+                    </td>
+                  </tr>
+
+                  <tr>
+                    <td style="text-align:right;">
+                      <span class="ac-label">المبلغ المدفوع:</span>
+                      <span class="ac-value" t-out="o.amount" t-options='{"widget":"monetary","display_currency": o.currency_id}'/>
+                    </td>
+                    <td style="text-align:right;">
+                      <span class="ac-label">رقم العملية:</span>
+                      <span class="ac-value" t-esc="o.bank_reference or o.payment_reference or o.ref or ''"/>
+                    </td>
+                  </tr>
+
+                  <tr>
+                    <td style="text-align:right;">
+                      <span class="ac-label">تاريخ الإيصال:</span>
+                      <span class="ac-value" t-out="o.date" t-options='{"widget":"date"}'/>
+                    </td>
+                    <td style="text-align:right;">
+                      <span class="ac-label">تاريخ السداد:</span>
+                      <span class="ac-value" t-out="o.bankak_pay_date" t-options='{"widget":"date"}'/>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td colspan="2" style="text-align:right;">
+                      <span class="ac-label">المستوى:</span>
+                      <t t-if="o.student_level">
+                        <span class="ac-value" t-esc="o.student_level"/>
+                      </t>
+                      <t t-elif="o.student_id and o.student_id.level">
+                        <span class="ac-value" t-esc="o.student_id.level"/>
+                      </t>
+                      <t t-else="">
+                        <span class="ac-value">-</span>
+                      </t>
+                    </td>
+                  </tr>
+
+                  <tr>
+                    <td colspan="3" style="text-align:right;">
+                      <span class="ac-label">العام الدراسي:</span>
+                      <t t-if="o.student_academic_year">
+                        <span class="ac-value" t-esc="o.student_academic_year"/>
+                      </t>
+                      <t t-elif="o.student_id and o.student_id.academic_year">
+                        <span class="ac-value" t-esc="o.student_id.academic_year"/>
+                      </t>
+                      <t t-else="">
+                        <span class="ac-value">-</span>
+                      </t>
+                    </td>
+                  </tr>
+
+                  <tr>
+                    <td colspan="3" style="text-align:right;">
+                      <span class="ac-label" style="font-size:9.5pt;">حساب البنك باسم:</span>
+
+                      <!-- Build label from invoice Printed Bank Account first -->
+                      <t t-set="bank_label" t-value="''"/>
+
+                      <!-- Prefer the first reconciled invoice's partner_bank_id -->
+                      <t t-if="o.reconciled_invoice_ids">
+                        <t t-foreach="o.reconciled_invoice_ids" t-as="inv">
+                          <t t-if="not bank_label">
+                            <t t-set="bank" t-value="inv.partner_bank_id"/>
+                            <t t-if="bank">
+                              <!-- number + holder (like dropdown); swap to bank.acc_holder_name if you want name only -->
+                              <t t-set="bank_label" t-value="bank.display_name or (bank.acc_number or '')"/>
+                            </t>
+                          </t>
+                        </t>
+                      </t>
+
+                      <!-- Fallback: the payment's bank journal's bank account -->
+                      <t t-if="not bank_label and o.journal_id and o.journal_id.bank_account_id">
+                        <t t-set="bank" t-value="o.journal_id.bank_account_id"/>
+                        <t t-set="bank_label" t-value="bank.display_name or (bank.acc_number or '')"/>
+                      </t>
+
+                      <span class="ac-value" t-esc="bank_label or '-'"/>
+                    </td>
+
+                  </tr>
+                </table>
+              </div>
+
+              <!-- جدول التفاصيل -->
+              <table class="ac-table">
+                <thead>
+                  <tr>
+                    <th style="width:18%;">تاريخ الفاتورة</th>
+                    <th style="width:26%;">رقم الفاتورة</th>
+                    <th>مرجع</th>
+                    <th style="width:20%;">المبلغ</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <t t-set="invoices" t-value="o.reconciled_invoice_ids or o.reconciled_bill_ids"/>
+                  <t t-foreach="invoices" t-as="inv">
+                    <tr>
+                      <td class="ac-num">
+                        <span t-out="inv.invoice_date" t-options='{"widget":"date"}'/>
+                      </td>
+                      <td class="ac-num">
+                        <span t-esc="inv.name"/>
+                      </td>
+                      <td class="">
+                        <span t-esc="inv.ref or ''"/>
+                      </td>
+                      <td class="ac-num">
+                        <span t-out="inv.amount_total" t-options='{"widget":"monetary","display_currency": inv.currency_id}'/>
+                      </td>
+                    </tr>
+
+                    <!-- تفاصيل التسويات الجزئية -->
+                    <t t-foreach="inv._get_reconciled_invoices_partials()[0]" t-as="par">
+                      <t t-set="partial" t-value="par[0]"/>
+                      <t t-set="ml_other" t-value="partial.debit_move_id if partial.debit_move_id.move_id.id != inv.id else partial.credit_move_id"/>
+                      <t t-set="pay" t-value="ml_other.move_id.payment_id"/>
+                      <t t-set="amt" t-value="-par[1]"/>
+
+                      <tr>
+                        <td class="ac-num">
+                          <span t-out="(pay and pay.date) or ml_other.date" t-options='{"widget":"date"}'/>
+                        </td>
+                        <td class="ac-num">
+                          <span t-esc="(pay and pay.name) or ml_other.move_id.name"/>
+                        </td>
+                        <td>
+                          <span t-esc="(pay and (pay.bank_reference or pay.payment_reference or pay.ref)) or (ml_other.name or '')"/>
+                        </td>
+                        <td class="ac-num">
+                          <span t-out="amt" t-options='{"widget":"monetary","display_currency": inv.currency_id}'/>
+                        </td>
+                      </tr>
+                    </t>
+
+                    <!-- متبقي الفاتورة -->
+                    <tr class="ac-total">
+                      <td></td>
+                      <td colspan="2" style="text-align:right;">
+                        <strong>المتبقي على الفاتورة برقم                          <t t-esc="inv.name"/>
+                        </strong>
+                      </td>
+                      <td class="ac-num">
+                        <strong>
+                          <span t-out="inv.amount_residual" t-options='{"widget":"monetary","display_currency": inv.currency_id}'/>
+                        </strong>
+                      </td>
+                    </tr>
+                  </t>
+                </tbody>
+              </table>
+
+            </div>
+          </div>
+          <!-- ===== /الصفحة الأولى ===== -->
+
+          <!-- جمع مرفقات Bankak (صور PNG) -->
+          <t t-set="bankak_attachments" t-value="env['ir.attachment'].sudo().search([('res_model','=','account.payment'), ('res_id','=',o.id), ('mimetype','=','image/png'), ('name','ilike','bankak')], order='create_date desc')"/>
+
+          <!-- ===== الصفحة الثانية: صورة Bankak المُخزّنة في الحقل الثنائي (إن وُجدت) ===== -->
+          <t t-if="o.bankak_receipt">
+            <div class="page">
+              <!-- مسافة لتفريغ أعلى الصفحة قبل الصورة -->
+              <div style="height: 80mm;"></div>
+
+              <div class="acmst-doc" style="text-align:center;">
+                <h3 class="ac-sub" style="margin-bottom:8mm;">صورة إيصال Bankak</h3>
+                <img t-att-src="'/web/image/account.payment/%s/bankak_receipt/%s' % (o.id, o.bankak_receipt_filename or '')" style="max-width:100%; max-height:400px; display:block; margin:0 auto;"/>
+              </div>
+
+              <!-- تذييل مثبت (تاريخ الطباعة يمين، الختم وسط، اسم الموظف يسار) -->
+              <t t-set="now" t-value="datetime.datetime.now()"/>
+              <div class="ac-fixed-footer">
+                <table style="width:100%; font-size:10pt; text-align:center;">
+                  <tr>
+                    <td style="width:33%; text-align:right;">
+                      تاريخ الطباعة:
+                      <span t-out="now" t-options='{"widget":"datetime"}'/>
+                    </td>
+                    <td style="width:34%; text-align:center;">
+                      <img t-if="env.company.acmst_college_stamp" t-att-src="'/web/image/res.company/%s/acmst_college_stamp' % (env.company.id)" alt="Stamp" style="max-height:80px;"/>
+                    </td>
+                    <td style="width:33%; text-align:left;">
+                      اسم الموظف:
+                      <span t-esc="(o.create_uid and o.create_uid.name) or env.user.name"/>
+                    </td>
+                  </tr>
+                </table>
+              </div>
+            </div>
+          </t>
+
+          <!-- ===== صفحات لاحقة: كل مرفق Bankak في صفحة مستقلة مع تذييل على الصفحة الأخيرة فقط ===== -->
+          <t t-if="bankak_attachments">
+            <t t-foreach="bankak_attachments" t-as="att">
+              <div class="page">
+                <div style="height: 25mm;"></div>
+
+                <div class="acmst-doc avoid-break" style="text-align:center;">
+                  <h3 class="ac-sub" style="margin-bottom:8mm;">صورة إيصال Bankak</h3>
+                  <img t-att-src="'/web/image/ir.attachment/%s/datas' % att.id" style="max-width:100%; max-height:640px; display:block; margin:0 auto;"/>
+                  <div style="font-size:9pt; margin-top:4px;" t-esc="att.name"/>
+                </div>
+
+                <!-- التذييل فقط في آخر صفحة -->
+                <t t-if="att.id == bankak_attachments[-1].id">
+                  <t t-set="now" t-value="datetime.datetime.now()"/>
+                  <div class="ac-fixed-footer">
+                    <table style="width:100%; font-size:10pt; text-align:center;">
+                      <tr>
+                        <td style="width:33%; text-align:right;">
+                          تاريخ الطباعة:
+                          <span t-out="now" t-options='{"widget":"datetime"}'/>
+                        </td>
+                        <td style="width:34%; text-align:center;">
+                          <img t-if="env.company.acmst_college_stamp" t-att-src="'/web/image/res.company/%s/acmst_college_stamp' % (env.company.id)" alt="Stamp" style="max-height:80px;"/>
+                        </td>
+                        <td style="width:33%; text-align:left;">
+                          اسم الموظف:
+                          <span t-esc="(o.create_uid and o.create_uid.name) or env.user.name"/>
+                        </td>
+                      </tr>
+                    </table>
+                  </div>
+                </t>
+              </div>
+            </t>
+          </t>
+
+          <!-- إذا لا توجد صور Bankak نهائيًا، صفحة تذييل فقط (اختياري) -->
+          <t t-if="not o.bankak_receipt and not bankak_attachments">
+            <div class="page">
+              <t t-set="now" t-value="datetime.datetime.now()"/>
+              <div class="ac-fixed-footer">
+                <table style="width:100%; font-size:10pt; text-align:center;">
+                  <tr>
+                    <td style="width:33%; text-align:right;">
+                      تاريخ الطباعة:
+                      <span t-out="now" t-options='{"widget":"datetime"}'/>
+                    </td>
+                    <td style="width:34%; text-align:center;">
+                      <img t-if="env.company.acmst_college_stamp" t-att-src="'/web/image/res.company/%s/acmst_college_stamp' % (env.company.id)" alt="Stamp" style="max-height:80px;"/>
+                    </td>
+                    <td style="width:33%; text-align:left;">
+                      اسم الموظف:
+                      <span t-esc="(o.create_uid and o.create_uid.name) or env.user.name"/>
+                    </td>
+                  </tr>
+                </table>
+              </div>
+            </div>
+          </t>
+
+        </t>
+      </t>
+    </t>
+  </template>
+
+</odoo>

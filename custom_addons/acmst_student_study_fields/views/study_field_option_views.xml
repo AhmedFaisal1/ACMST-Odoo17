@@ -1,0 +1,38 @@
+<odoo>
+    <record id="view_study_field_option_tree" model="ir.ui.view">
+        <field name="name">study.field.option.tree</field>
+        <field name="model">acmst.study.field.option</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name"/>
+                <field name="code"/>
+                <field name="active"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_study_field_option_form" model="ir.ui.view">
+        <field name="name">study.field.option.form</field>
+        <field name="model">acmst.study.field.option</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <field name="name"/>
+                        <field name="code"/>
+                        <field name="active"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_study_field_option" model="ir.actions.act_window">
+        <field name="name">Study Field Options</field>
+        <field name="res_model">acmst.study.field.option</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <menuitem id="menu_acmst_root" name="Student Study Fields"/>
+    <menuitem id="menu_study_field_option" name="Field Options" parent="menu_acmst_root" action="action_study_field_option"/>
+</odoo>

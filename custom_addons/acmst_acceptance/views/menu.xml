@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- App root -->
+    <menuitem id="menu_acmst_acceptance_root" name="ACMST Acceptance" sequence="20"/>
+
+    <!-- Acceptance Forms menu -->
+    <menuitem id="menu_acmst_acceptance_forms" name="Acceptance Forms" parent="menu_acmst_acceptance_root" sequence="10" action="acmst_acceptance.action_open_acceptance_form"/>
+
+    <!-- Guardians menu -->
+    <menuitem id="menu_acmst_acceptance_guardians" name="Guardians" parent="menu_acmst_acceptance_root" sequence="20" action="acmst_acceptance.action_open_acceptance_guardian"/>
+</odoo>
+

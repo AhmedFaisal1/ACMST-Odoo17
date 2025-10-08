@@ -1,0 +1,8 @@
+/* Hide the "Customer Invoice" text prefix but keep the invoice number visible.  */
+.o_form_view .o_invoice_header h2 {
+  font-size: 0 !important;              /* hide text nodes */
+}
+.o_form_view .o_invoice_header h2 .o_field_widget[name="name"] {
+  font-size: 1.25rem !important;        /* show the number again */
+  font-weight: 600;
+}

@@ -1,0 +1,30 @@
+/* Report-specific RTL styles and font rules.
+   Place font files under acmst_admission/static/src/fonts and update @font-face URLs if available. */
+
+@font-face {
+  font-family: 'Amiri';
+  src: url('/acmst_admission/static/src/fonts/Amiri-Regular.ttf') format('truetype');
+  font-weight: normal; font-style: normal;
+}
+@font-face {
+  font-family: 'Cairo';
+  src: url('/acmst_admission/static/src/fonts/Cairo-Regular.ttf') format('truetype');
+  font-weight: normal; font-style: normal;
+}
+
+body.o_report_rtl {
+  direction: rtl;
+  font-family: 'Amiri', 'Cairo', 'Noto Naskh Arabic', Tahoma, Arial, sans-serif;
+}
+
+.o_report_brand_header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #ccc;
+  margin-bottom: 12px;
+  padding-bottom: 6px;
+}
+
+.o_report_brand_title { font-size: 18px; font-weight: 600; }
+

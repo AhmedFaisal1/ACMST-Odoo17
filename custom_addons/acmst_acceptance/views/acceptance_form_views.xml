@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_acceptance_form" model="ir.ui.view">
+        <field name="name">acmst.acceptance.form.view</field>
+        <field name="model">acmst.acceptance.form</field>
+        <field name="arch" type="xml">
+            <form string="Acceptance Form">
+                <header>
+                    <!-- HTML preview via report action -->
+                    <button name="acmst_acceptance.action_report_acceptance_form_html" type="action" string="Preview" class="oe_highlight"/>
+                    <!-- Direct PDF using Python method -->
+                    <button name="action_print_pdf" type="object" string="Print PDF" class="btn-secondary"/>
+                </header>
+                <sheet>
+
+                    <!-- Type of Admission + Photo -->
+                    <group string="نوع القبول / Type of Admission" col="4">
+                        <group colspan="3" col="1">
+                            <field name="admission_type" widget="radio"/>
+                        </group>
+                        <group colspan="1" col="1">
+                            <field name="photo" widget="image" class="oe_avatar"/>
+                        </group>
+                    </group>
+
+                    <!-- PERSONAL INFORMATION (stable 2 columns) -->
+                    <group string="البيانات الشخصية / Personal Information" col="4">
+                        <group colspan="2" col="1">
+                            <field name="full_name_ar" required="1"/>
+                            <field name="full_name_en" required="1"/>
+                            <field name="gender"/>
+                            <field name="nationality"/>
+                            <field name="religion"/>
+                            <field name="birth_date"/>
+                        </group>
+
+                        <group colspan="2" col="1">
+                            <field name="birth_place"/>
+                            <field name="identification_document"/>
+                            <field name="document_number"/>
+                            <field name="address"/>
+                            <field name="city"/>
+                            <field name="phone1"/>
+                            <field name="phone2"/>
+                            <field name="email" widget="email"/>
+
+                        </group>
+                    </group>
+
+                    <!-- GUARDIAN DETAILS (full width) -->
+                    <separator string="بيانات ولي الأمر / GUARDIAN DETAILS"/>
+                    <field name="guardian_ids" nolabel="1" colspan="4" context="{'default_wizard_id': id}">
+                        <tree string="Guardians" editable="bottom" create="true" delete="true" decoration-success="is_default" options="{'no_create_edit': true}">
+                            <field name="name" string="Guardian Name" required="1"/>
+                            <field name="relation" string="Relationship"/>
+                            <field name="phone" string="Phone"/>
+                            <field name="address" string="Address"/>
+                            <field name="is_default" string="Default" widget="boolean_toggle"/>
+                        </tree>
+                    </field>
+
+                    <!-- ADMISSION (two columns, tighter spacing) -->
+                    <group string="بيانات القبول / Admission" col="2">
+                        <group col="1">
+                            <field name="academic_year"/>
+                            <field name="university_id"/>
+                            <field name="secondary_school"/>
+                        </group>
+                        <group col="1">
+                            <field name="program_name"/>
+                            <field name="certificate_type"/>
+                            <field name="secondary_percentage" placeholder="مثال: 85.5"/>
+                        </group>
+                    </group>
+
+                    <group string="بيانات المؤسسة التعليمية السابقة لقبول (التجسير + التحويل + الناضجين)" col="2" modifiers='{"invisible": [["admission_type","not in",["bridging","transfer","degree_holder","mature"]]]}'>
+                        <group col="1">
+
+                            <field name="prev_inst_name" colspan="3"/>
+                            <field name="prev_inst_join_year" colspan="3"/>
+                            <field name="prev_grad_cert_type" colspan="3"/>
+                        </group>
+                        <group col="1">
+
+                            <field name="prev_inst_years_completed" colspan="3"/>
+                            <field name="prev_inst_program" colspan="3"/>
+                        </group>
+
+                    </group>
+
+                </sheet>
+                <footer>
+                    <button name="action_save" type="object" class="btn-primary" string="Save"/>
+                    <button name="action_print_pdf" type="object" class="btn-secondary" string="Print PDF"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <!-- Tree view for listings -->
+    <record id="view_acceptance_form_tree" model="ir.ui.view">
+        <field name="name">acmst.acceptance.form.tree</field>
+        <field name="model">acmst.acceptance.form</field>
+        <field name="arch" type="xml">
+            <tree string="Acceptance Forms" create="1" edit="1">
+                <field name="full_name_ar"/>
+                <field name="full_name_en"/>
+                <field name="admission_type"/>
+                <field name="academic_year"/>
+                <field name="program_name"/>
+                <field name="university_id"/>
+                <field name="admission_date"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Removed duplicate preview action; the canonical one lives in
+         report/acceptance_form_report.xml and uses the same XML ID
+         (acmst_acceptance.action_report_acceptance_form_html). -->
+
+    <!-- Main action for Acceptance Forms -->
+    <record id="action_open_acceptance_form" model="ir.actions.act_window">
+        <field name="name">Acceptance Forms</field>
+        <field name="res_model">acmst.acceptance.form</field>
+        <field name="view_mode">tree,form</field>
+        <field name="view_id" ref="view_acceptance_form_tree"/>
+        <field name="target">current</field>
+    </record>
+
+</odoo>

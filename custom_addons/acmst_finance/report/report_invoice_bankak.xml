@@ -1,0 +1,20 @@
+<odoo>
+    <template id="report_invoice_document_inherit_bankak" inherit_id="account.report_invoice_document">
+        <xpath expr="//div[@class='row mt32 mb32']/div[last()]" position="after">
+            <!-- Small block under the totals or details area; move xpath to suit your layout -->
+            <div class="mt8">
+                <t t-if="o.bankak_pay_date">
+                    <div>
+                        <strong>Bankak Pay Date: </strong>
+                        <span t-esc="o.bankak_pay_date"/>
+                    </div>
+                </t>
+                <t t-if="o.bankak_receipt">
+                    <div class="mt4">
+                        <img t-att-src="'data:image/png;base64,%s' % o.bankak_receipt" style="max-height:150px;"/>
+                    </div>
+                </t>
+            </div>
+        </xpath>
+    </template>
+</odoo>

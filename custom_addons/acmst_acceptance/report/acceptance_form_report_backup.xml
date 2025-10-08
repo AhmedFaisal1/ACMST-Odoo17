@@ -1,0 +1,2485 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Paperformat -->
+    <record id="paperformat_acmst_acceptance" model="report.paperformat">
+        <field name="name">ACMST Acceptance A4</field>
+        <field name="format">A4</field>
+        <field name="orientation">Portrait</field>
+        <field name="margin_top">10</field>
+        <field name="margin_bottom">22</field>
+        <field name="margin_left">8</field>
+        <field name="margin_right">8</field>
+        <field name="header_spacing">6</field>
+    </record>
+
+    <!-- PDF + HTML actions -->
+    <record id="action_report_acceptance_form_wiz" model="ir.actions.report">
+        <field name="name">Acceptance Form</field>
+        <field name="model">acmst.acceptance.form</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">acmst_acceptance.report_acceptance_form</field>
+        <field name="paperformat_id" ref="acmst_acceptance.paperformat_acmst_acceptance"/>
+        <field name="print_report_name">'Acceptance_' + (object.university_id or (object.full_name_en or object.full_name_ar or 'Record'))</field>
+    </record>
+
+    <record id="action_report_acceptance_form_html" model="ir.actions.report">
+        <field name="name">Acceptance Form (Preview)</field>
+        <field name="model">acmst.acceptance.form</field>
+        <field name="report_type">qweb-html</field>
+        <field name="report_name">acmst_acceptance.acceptance_form_report_html</field>
+        <field name="paperformat_id" ref="acmst_acceptance.paperformat_acmst_acceptance"/>
+    </record>
+
+    <!-- HTML Preview template -->
+    <template id="acceptance_form_report_html">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-call="web.basic_layout">
+                    <style>
+                        /* Hide any default external header just in case */
+                        .header, .o_clean_header, .o_background_header { display:none !important; }
+                        
+                        /* Preview-specific styles */
+                        body { font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height:1.6; color:#374151; background:#fff; }
+                        .form-container { max-width: 800px; margin: 0 auto; padding: 20px; }
+                        .preview-header { text-align: center; margin-bottom: 20px; padding: 20px; background: #f8f9fa; border-radius: 8px; }
+                        .preview-title { font-size: 24px; font-weight: 700; color: #10b981; margin-bottom: 10px; }
+                        .preview-subtitle { font-size: 16px; color: #6b7280; }
+                        
+                        /* Use the same styles as the PDF version but optimized for screen viewing */
+                        .ac-banner{ width:100%; table-layout:fixed; border-collapse:collapse; margin:6px 0 10px; }
+                        .ac-banner td{ border:1px solid #9ca3af; padding:10px 8px; vertical-align:middle; }
+                        .ac-banner .en{ text-align:center; direction:ltr; font-size:12pt; line-height:1.45; }
+                        .ac-banner .ar{ text-align:center; direction:rtl; font-size:12pt; line-height:1.6; }
+                        .ac-banner .logo-cell{ text-align:center; }
+                        .ac-banner .logo{ max-height:95px; display:block; margin:0 auto; }
+                        .ac-title-main{ text-align:center; font-weight:800; font-size:22px; margin:8px 0 10px; color:#111827; }
+                        
+                        /* Section cards */
+                        .section-card { background:#fff; border-radius:16px; margin-bottom:20px; box-shadow:0 4px 16px rgba(0,0,0,.04); border:1px solid #e5e7eb; overflow:hidden; }
+                        .section-header { background:#d1fae5; padding:16px 20px; border-bottom:1px solid #a7f3d0; text-align:center; }
+                        .section-title { font-size:18px; font-weight:600; color:#111827; margin:0; }
+                        .section-body { padding: 24px; }
+                        
+                        /* Field groups */
+                        .field-group { margin-bottom:16px; font-size:0; }
+                        .field-group.single { grid-template-columns: 1fr; }
+                        .field { background:#f9fafb; border:1px solid #e5e7eb; border-radius:12px; overflow:hidden; }
+                        .field-group .field { display:inline-block; vertical-align:top; width:48%; margin:0 2% 16px 0; font-size:14px; }
+                        .field-group .field:nth-child(2n) { margin-right:0; }
+                        .field-group.single .field { width:100%; margin-right:0; }
+                        .field-label { background:#f3f4f6; padding:10px 14px; font-weight:600; font-size:13px; color:#374151; border-bottom:1px solid #e5e7eb; text-align:center; direction:rtl; }
+                        .field-value { padding:12px 14px; min-height:20px; background:#fff; font-size:14px; color:#111827; text-align:center; }
+                        
+                        /* Hide page breaks in preview */
+                        .pb { display:none; }
+                        
+                        /* Two-column rows */
+                        .field-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px;}
+                        .field-row.single{grid-template-columns:1fr;}
+                    </style>
+
+                    <!-- Preview Header -->
+                    <div class="preview-header">
+                    </div>
+
+                    <!-- Use the same content as the PDF version but without page breaks -->
+                    <t t-call="acmst_acceptance.acceptance_form_content"/>
+                </t>
+            </t>
+        </t>
+    </template>
+
+    <!-- Form content template (reusable) -->
+    <template id="acceptance_form_content">
+        <t t-foreach="docs" t-as="o">
+            <!-- === Boxed bilingual banner === -->
+            <table class="ac-banner">
+                <colgroup>
+                    <col style="width:33%"/>
+                    <col style="width:34%"/>
+                    <col style="width:33%"/>
+                </colgroup>
+                <tr>
+                    <!-- Left: English -->
+                    <td class="en">
+      Ministry of Higher Education and<br/>
+      Scientific Research<br/>
+      AL-Madain College for Medical<br/>
+      Sciences &amp; Technology<br/>
+      Admission Office
+        </td>
+
+        <!-- Center: Logo -->
+        <td class="logo-cell">
+            <img class="logo" t-if="(o.company_id or user.company_id) and (o.company_id or user.company_id).logo" t-att-src="'/web/image/res.company/%s/logo' % ((o.company_id or user.company_id).id)"/>
+        </td>
+
+        <!-- Right: Arabic -->
+        <td class="ar">
+      وزارة التعليم العالي والبحث العلمي            <br/>
+      كلية المدائن للعلوم الطبية والتكنولوجيا            <br/>
+      أمانة الشؤون العلمية            <br/>
+      إدارة القبول
+        </td>
+    </tr>
+</table>
+
+<!-- Title under banner -->
+<div class="ac-title-main">استمارة القبول — Acceptance Form</div>
+
+<!-- === Photo (left) | Status (center) | QR (right) === -->
+<table class="ac-strip">
+    <colgroup>
+        <col style="width:33%"/>
+        <col style="width:34%"/>
+        <col style="width:33%"/>
+    </colgroup>
+    <tr>
+        <!-- LEFT: Photo -->
+        <td class="left">
+            <div class="ac-photo-frame">
+                <t t-if="'photo' in o._fields and o.photo">
+                    <img class="ac-photo" t-att-src="'/web/image/acmst.acceptance.form/%s/photo' % o.id"/>
+                </t>
+                <t t-elif="'image_1920' in o._fields and o.image_1920">
+                    <img class="ac-photo" t-att-src="'/web/image/acmst.acceptance.form/%s/image_1920' % o.id"/>
+                </t>
+                <t t-else="">
+                    <div style="width:120px;height:120px;display:flex;align-items:center;justify-content:center;color:#9ca3af;">
+            No Photo
+                    </div>
+                </t>
+            </div>
+        </td>
+
+        <!-- CENTER: Status -->
+        <td class="center" style="vertical-align:middle;">
+            <div class="ac-badge">
+                <t t-if="o.admission_type == 'direct'">قبول مباشر</t>
+                <t t-elif="o.admission_type == 'general'">عام</t>
+                <t t-elif="o.admission_type == 'regular'">نظامي</t>
+                <t t-elif="o.admission_type == 'private'">خاص</t>
+                <t t-elif="o.admission_type == 'transfer'">تحويل</t>
+                <t t-elif="o.admission_type == 'bridging'">تجسير</t>
+                <t t-elif="o.admission_type == 'degree_holder'">حملة درجات علمية</t>
+                <t t-elif="o.admission_type == 'private_grant'">منح التعليم الأهلي</t>
+                <t t-else="">-</t>
+            </div>
+        </td>
+
+        <!-- RIGHT: QR -->
+        <td class="right">
+            <div class="ac-qr-wrap">
+                <t t-set="qr_value" t-value="'ACMST|ACC:%s|UID:%s' % (o.id, (o.university_id or ''))"/>
+                <img class="ac-qr" t-att-src="'/report/barcode/?type=QR&amp;value=%s&amp;width=120&amp;height=120' % qr_value"/>
+                <div class="ac-qr-label" t-esc="o.university_id or ('AF-%s' % o.id)"/>
+            </div>
+        </td>
+    </tr>
+</table>
+
+<!-- Personal Information -->
+<div class="section-card keep">
+    <div class="section-header">
+        <h2 class="section-title">البيانات الشخصية / Personal Information</h2>
+    </div>
+    <div class="section-body">
+        <!-- Row 1: Full Name | Sex -->
+        <div class="field-row">
+            <!-- Full name -->
+            <div t-attf-class="field enhanced-field #{(o.full_name_ar or o.full_name_en) and 'field-filled' or 'field-empty'}">
+                <div class="field-label">
+                    <span class="required-mark">*</span> الاسم الرباعي — Full Name
+                </div>
+                <div class="field-value">
+                    <t t-if="o.full_name_ar">
+                        <div class="name-line">
+                            <span class="lang-indicator">AR</span>
+                            <span dir="rtl" t-esc="o.full_name_ar"/>
+                        </div>
+                    </t>
+                    <t t-if="o.full_name_en">
+                        <div class="name-line">
+                            <span class="lang-indicator">EN</span>
+                            <span dir="ltr" t-esc="o.full_name_en"/>
+                        </div>
+                    </t>
+                    <t t-if="not (o.full_name_ar or o.full_name_en)">
+                        <span class="empty-value">Not provided</span>
+                    </t>
+                </div>
+            </div>
+
+            <!-- Sex -->
+            <div t-attf-class="field enhanced-field #{o.gender and 'field-filled' or 'field-empty'}">
+                <div class="field-label">
+                    <span class="required-mark">*</span> الجنس — Sex</div>
+                <div class="field-value">
+                    <t t-if="o.gender == 'male'">
+                        <span class="gender-badge male">ذكر — Male</span>
+                    </t>
+                    <t t-elif="o.gender == 'female'">
+                        <span class="gender-badge female">أنثى — Female</span>
+                    </t>
+                    <t t-else="">
+                        <span class="empty-value">Not specified</span>
+                    </t>
+                </div>
+            </div>
+        </div>
+
+        <!-- Row 2: Nationality | ID Type & Number -->
+        <div class="field-row">
+            <div t-attf-class="field enhanced-field #{o.nationality and 'field-filled' or 'field-empty'}">
+                <div class="field-label">
+                    <span class="required-mark">*</span> الجنسية — Nationality</div>
+                <div class="field-value">
+                    <t t-if="o.nationality">
+                        <span t-esc="o.nationality"/>
+                    </t>
+                    <t t-else="">
+                        <span class="empty-value">Not provided</span>
+                    </t>
+                </div>
+            </div>
+
+            <div t-attf-class="field enhanced-field #{o.document_number and 'field-filled' or 'field-empty'}">
+                <div class="field-label">
+                    <span class="required-mark">*</span> نوع/رقم الهوية — ID Type &amp; Number</div>
+                <div class="field-value">
+                    <t t-if="o.identification_document and o.document_number">
+                        <t t-if="o.identification_document == 'passport'">
+                            <span class="id-badge">Passport</span>
+                        </t>
+                        <t t-elif="o.identification_document">
+                            <span class="id-badge">National ID</span>
+                        </t>
+                        <t t-else="">
+                            <span class="id-badge">ID</span>
+                        </t>
+                        <span> — </span>
+                        <span dir="ltr" class="ac-num id-number" t-esc="o.document_number"/>
+                    </t>
+                    <t t-else="">
+                        <span class="empty-value">Not provided</span>
+                    </t>
+                </div>
+            </div>
+        </div>
+
+        <!-- Row 3: Date of Birth | Place of Birth -->
+        <div class="field-row">
+            <div t-attf-class="field enhanced-field #{o.birth_date and 'field-filled' or 'field-empty'}">
+                <div class="field-label">
+                    <span class="required-mark">*</span> تاريخ الميلاد — Date of Birth</div>
+                <div class="field-value">
+                    <t t-if="o.birth_date">
+                        <span class="date-value" t-out="o.birth_date" t-options='{"widget":"date"}'/>
+                    </t>
+                    <t t-else="">
+                        <span class="empty-value">Not provided</span>
+                    </t>
+                </div>
+            </div>
+
+            <div t-attf-class="field enhanced-field #{o.birth_place and 'field-filled' or 'field-empty'}">
+                <div class="field-label">مكان الميلاد — Place of Birth</div>
+                <div class="field-value">
+                    <t t-if="o.birth_place">
+                        <span t-esc="o.birth_place"/>
+                    </t>
+                    <t t-else="">
+                        <span class="empty-value">Not provided</span>
+                    </t>
+                </div>
+            </div>
+        </div>
+
+        <!-- Row 4: Email | Primary Phone -->
+        <div class="field-row">
+            <div t-attf-class="field enhanced-field #{o.email and 'field-filled' or 'field-empty'}">
+                <div class="field-label">
+                    <span class="required-mark">*</span> البريد الإلكتروني — Email</div>
+                <div class="field-value">
+                    <t t-if="o.email">
+                        <span dir="ltr" class="email-value" t-esc="o.email"/>
+                    </t>
+                    <t t-else="">
+                        <span class="empty-value">Not provided</span>
+                    </t>
+                </div>
+            </div>
+
+            <div t-attf-class="field enhanced-field #{o.phone1 and 'field-filled' or 'field-empty'}">
+                <div class="field-label">
+                    <span class="required-mark">*</span> هاتف أساسي — Primary Phone</div>
+                <div class="field-value">
+                    <t t-if="o.phone1">
+                        <span class="ac-num phone-number" dir="ltr" t-esc="o.phone1"/>
+                    </t>
+                    <t t-else="">
+                        <span class="empty-value">Not provided</span>
+                    </t>
+                </div>
+            </div>
+        </div>
+
+        <!-- Row 5: Secondary Phone | Address -->
+        <div class="field-row">
+            <div t-attf-class="field enhanced-field #{o.phone2 and 'field-filled' or 'field-empty'}">
+                <div class="field-label">هاتف ثانوي — Secondary Phone</div>
+                <div class="field-value">
+                    <t t-if="o.phone2">
+                        <span class="ac-num phone-number" dir="ltr" t-esc="o.phone2"/>
+                    </t>
+                    <t t-else="">
+                        <span class="empty-value">Optional</span>
+                    </t>
+                </div>
+            </div>
+
+            <div t-attf-class="field enhanced-field #{(o.address or o.city) and 'field-filled' or 'field-empty'}">
+                <div class="field-label">
+                    <span class="required-mark">*</span> العنوان — Address</div>
+                <div class="field-value address-container">
+                    <t t-if="o.address or o.city">
+                        <div class="address-lines">
+                            <t t-if="o.address">
+                                <div class="address-line">
+                                    <span dir="rtl" t-esc="o.address"/>
+                                </div>
+                            </t>
+                            <t t-if="o.city">
+                                <div class="address-line">
+                                    <span class="location-label">City:</span>
+                                    <span dir="ltr" t-esc="o.city"/>
+                                </div>
+                            </t>
+                        </div>
+                    </t>
+                    <t t-else="">
+                        <span class="empty-value">Address not provided</span>
+                    </t>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Page break after Personal Information (Pages 1-2) -->
+<div class="pb"></div>
+
+<!-- Admission Information -->
+<div class="section-card keep">
+    <div class="section-header">
+        <h2 class="section-title">بيانات القبول / Admission Information</h2>
+    </div>
+    <div class="section-body">
+        <!-- Row 1 -->
+        <div class="field-row">
+            <div t-attf-class="field enhanced-field #{o.university_id and 'field-filled' or 'field-empty'}">
+                <div class="field-label">الرقم الجامعي — University ID</div>
+                <div class="field-value">
+                    <span t-esc="o.university_id or '-'"/>
+                </div>
+            </div>
+            <div t-attf-class="field enhanced-field #{o.program_name and 'field-filled' or 'field-empty'}">
+                <div class="field-label">البرنامج — Program</div>
+                <div class="field-value">
+                    <span t-esc="o.program_name or '-'"/>
+                </div>
+            </div>
+        </div>
+
+        <!-- Row 2 -->
+        <div class="field-row">
+            <div t-attf-class="field enhanced-field #{o.college_name and 'field-filled' or 'field-empty'}">
+                <div class="field-label">الكلية — College</div>
+                <div class="field-value">
+                    <span t-esc="o.college_name or '-'"/>
+                </div>
+            </div>
+            <div t-attf-class="field enhanced-field #{o.academic_year and 'field-filled' or 'field-empty'}">
+                <div class="field-label">عام القبول — Admission Year</div>
+                <div class="field-value">
+                    <span t-esc="o.academic_year or '-'"/>
+                </div>
+            </div>
+        </div>
+
+        <!-- Row 3 -->
+        <div class="field-row">
+            <div t-attf-class="field enhanced-field #{(('graduation_certificate_type' in o._fields and o.graduation_certificate_type) or o.certificate_type) and 'field-filled' or 'field-empty'}">
+                <div class="field-label">نوع الشهادة — Certificate Type</div>
+                <div class="field-value">
+                    <t t-if="'graduation_certificate_type' in o._fields">
+                        <span t-esc="o.graduation_certificate_type or '-'"/>
+                    </t>
+                    <t t-else="">
+                        <span t-esc="o.certificate_type or '-'"/>
+                    </t>
+                </div>
+            </div>
+            <div t-attf-class="field enhanced-field #{(o.secondary_percentage is not False and o.secondary_percentage is not None) and 'field-filled' or 'field-empty'}">
+                <div class="field-label">نسبة الشهادة للثانوية — Secondary Certificate Percentage</div>
+                <div class="field-value">
+                    <t t-if="o.secondary_percentage is not False and o.secondary_percentage is not None">
+                        <span t-esc="o.secondary_percentage"/>
+                        <span>%</span>
+                    </t>
+                    <t t-else="">
+                        <span class="empty-value">-</span>
+                    </t>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Guardian Details -->
+<div class="section-card keep">
+    <div class="section-header">
+        <h2 class="section-title">بيانات ولي الأمر / Guardian Details</h2>
+    </div>
+    <div class="section-body">
+        <!-- Row 1 -->
+        <div class="field-row">
+            <div t-attf-class="field enhanced-field #{o.guardian_name and 'field-filled' or 'field-empty'}">
+                <div class="field-label">اسم ولي الأمر — Guardian Name</div>
+                <div class="field-value">
+                    <span t-esc="o.guardian_name or '-'"/>
+                </div>
+            </div>
+            <div t-attf-class="field enhanced-field #{o.guardian_relation and 'field-filled' or 'field-empty'}">
+                <div class="field-label">صلة القرابة — Relationship</div>
+                <div class="field-value">
+                    <span t-esc="o.guardian_relation or '-'"/>
+                </div>
+            </div>
+        </div>
+        <!-- Row 2 -->
+        <div class="field-row">
+            <div t-attf-class="field enhanced-field #{o.guardian_phone and 'field-filled' or 'field-empty'}">
+                <div class="field-label">هاتف — Phone</div>
+                <div class="field-value">
+                    <span class="ac-num" dir="ltr" t-esc="o.guardian_phone or '-'"/>
+                </div>
+            </div>
+            <div t-attf-class="field enhanced-field #{o.guardian_address and 'field-filled' or 'field-empty'}">
+                <div class="field-label">العنوان — Address</div>
+                <div class="field-value">
+                    <span t-esc="o.guardian_address or '-'"/>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Page break after Guardian Details (Page 3) -->
+<div class="pb"></div>
+
+<!-- Footer Information -->
+<div class="footer-info">
+    <div>
+        <strong>أعدّها — Prepared by:</strong>
+        <span t-esc="(o.create_uid and o.create_uid.name) or (user and user.name) or '-'"/>
+    </div>
+    <div>
+        <strong>تاريخ الطباعة — Printed on:</strong>
+        <span t-out="o.write_date or o.create_date" t-options='{"widget":"datetime"}'/>
+    </div>
+</div>
+</t>
+</template>
+
+<!-- QWeb template -->
+<template id="report_acceptance_form">
+<t t-call="web.html_container">
+<t t-foreach="docs" t-as="o">
+    <t t-call="web.basic_layout">
+
+        <style>
+  /* Hide any default external header just in case */
+  .header, .o_clean_header, .o_background_header { display:none !important; }
+
+  /* ----------------- NEW: Boxed bilingual banner ----------------- */
+  .ac-banner{ width:100%; table-layout:fixed; border-collapse:collapse; margin:6px 0 10px; }
+  .ac-banner td{ border:1px solid #9ca3af; padding:10px 8px; vertical-align:middle; }
+  .ac-banner .en{ text-align:center; direction:ltr; font-size:12pt; line-height:1.45; }
+  .ac-banner .ar{ text-align:center; direction:rtl; font-size:12pt; line-height:1.6; }
+  .ac-banner .logo-cell{ text-align:center; }
+  .ac-banner .logo{ max-height:95px; display:block; margin:0 auto; }
+
+  /* ----------------- NEW: Title under banner ----------------- */
+  .ac-title-main{ text-align:center; font-weight:800; font-size:22px; margin:8px 0 10px; color:#111827; }
+
+  /* ----------------- NEW: Status + Photo + QR strip ----------------- */
+  .ac-strip{ width:100%; table-layout:fixed; border-collapse:collapse; margin:6px 0 14px; }
+  .ac-strip td{ padding:4px 6px; vertical-align:top; }
+  .ac-strip .left{ text-align:left; }
+  .ac-strip .center{ text-align:center; }
+  .ac-strip .right{ text-align:right; }
+
+  /* NEW: Status badge (separate from .status-badge you already use elsewhere) */
+  .ac-badge{
+    display:inline-block; padding:6px 14px; border-radius:25px;
+    font-weight:700; border:2px solid #059669; color:#059669; font-size:14px;
+  }
+
+  /* --- Bilingual header layout (kept) --- */
+  .ac-head{ width:100%; table-layout:fixed; border-collapse:collapse; margin-bottom:8px; }
+  .ac-head td{ vertical-align:top; padding:0 6px; }
+  .ac-cell-right{ text-align:right; direction:rtl; font-size:11pt; line-height:1.35; }
+  .ac-cell-left{ text-align:left; direction:ltr; font-size:11pt; line-height:1.35; }
+  .ac-cell-center{ text-align:center; }
+  .ac-logo{ max-height:90px; display:block; margin:0 auto 6px; }
+  .ac-title{ text-align:center; font-weight:800; font-size:22px; margin:4px 0 10px; color:#111827; }
+
+  /* --- Photo and QR strip (kept; still safe to keep alongside .ac-strip) --- */
+  .ac-idstrip{ width:100%; table-layout:fixed; border-collapse:collapse; margin:4px 0 10px; }
+  .ac-idstrip td{ vertical-align:top; padding:0; }
+  .ac-id-left{ text-align:left; }
+  .ac-id-right{ text-align:right; }
+  .ac-photo-frame{
+    display:inline-block; padding:4px; border:1px solid #e5e7eb; border-radius:8px;
+    background:#fff; min-width:110px; min-height:110px;
+  }
+  .ac-photo{ max-width:120px; max-height:120px; display:block; }
+  .ac-qr-wrap{ display:inline-block; text-align:center; }
+  .ac-qr{ width:120px; height:120px; display:block; margin-left:auto; }
+  .ac-qr-label{ font-size:10pt; margin-top:4px; direction:ltr; text-align:center; }
+
+  /* -------- wkhtmltopdf fallbacks (kept) -------- */
+  ._priBg { background:#10b981; }
+  ._priBorder { border-color:#a7f3d0; }
+  ._priLightBg { background:#d1fae5; }
+  ._gray50 { background:#f9fafb; }
+  ._gray100 { background:#f3f4f6; }
+  ._gray200 { background:#e5e7eb; }
+  ._gray300 { border-color:#d1d5db; }
+  ._textGray { color:#374151; }
+
+  /* Modern color palette (kept) */
+  :root {
+    --primary: #10b981;
+    --primary-light: #a7f3d0;
+    --primary-lighter: #d1fae5;
+    --gray-50: #f9fafb;
+    --gray-100: #f3f4f6;
+    --gray-200: #e5e7eb;
+    --gray-300: #d1d5db;
+    --gray-600: #4b5563;
+    --gray-700: #374151;
+    --gray-900: #111827;
+  }
+
+  body { font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height:1.6; color:#374151; background:#fff; }
+
+  /* Main container (kept) */
+  .form-container { max-width: 800px; margin: 0 auto; padding: 20px; }
+
+  .simple-header { text-align: center; margin-bottom: 20px; }
+  .header-logo { max-height: 100px; margin-bottom: 10px; }
+  .header-title { font-size: 22px; font-weight: 700; margin: 5px 0 15px; color: #111827; }
+
+  .status-badge { display: inline-block; padding: 6px 14px; font-size: 14px; font-weight: 600; color: #059669; border: 2px solid #059669; border-radius: 25px; }
+
+  .header-title { font-size: 30px; font-weight: 800; margin-bottom: 16px; text-shadow: 0 3px 6px rgba(0,0,0,0.2); }
+
+  .header-content { text-align:center; font-size:0; }
+  .header-content > div { display:inline-block; vertical-align:middle; width:28%; font-size:14px; }
+  .header-content .logo-section { width:44%; }
+
+  .logo-section { margin: 0 auto 16px; }
+  .logo { max-height: 90px; border-radius: 50%; padding: 10px; background: #fff; box-shadow: 0 6px 20px rgba(0,0,0,0.15); }
+  .status-badges { margin-top: 12px; display: flex; justify-content: center; flex-wrap: wrap; gap: 8px; }
+  .badge { background: rgba(255,255,255,0.15); padding: 6px 14px; border-radius: 30px; font-size: 13px; font-weight: 600; letter-spacing: 0.5px; border: 1px solid rgba(255,255,255,0.3); }
+
+  /* Section cards (kept) */
+  .section-card { background:#fff; border-radius:16px; margin-bottom:20px; box-shadow:0 4px 16px rgba(0,0,0,.04); border:1px solid #e5e7eb; overflow:hidden; }
+  .section-header { background:#d1fae5; padding:16px 20px; border-bottom:1px solid #a7f3d0; }
+  .section-icon { width:24px; height:24px; background:#10b981; border-radius:6px; display:inline-block; text-align:center; color:#fff; font-size:14px; line-height:24px; margin-right:10px; }
+  .section-title { font-size:18px; font-weight:600; color:#111827; margin:0; display:inline-block; }
+  .section-body { padding: 24px; }
+
+  /* Field groups (kept) */
+  .field-group { margin-bottom:16px; font-size:0; }
+  .field-group.single { grid-template-columns: 1fr; }
+  .field { background:#f9fafb; border:1px solid #e5e7eb; border-radius:12px; overflow:hidden; }
+  .field-group .field { display:inline-block; vertical-align:top; width:48%; margin:0 2% 16px 0; font-size:14px; }
+  .field-group .field:nth-child(2n) { margin-right:0; }
+  .field-group.single .field { width:100%; margin-right:0; }
+  .field-label { background:#f3f4f6; padding:10px 14px; font-weight:600; font-size:13px; color:#374151; border-bottom:1px solid #e5e7eb; text-align:right; direction:rtl; }
+  .field-value { padding:12px 14px; min-height:20px; background:#fff; font-size:14px; color:#111827; direction:ltr; unicode-bidi:plaintext; }
+  .field-value.rtl { direction: rtl; text-align: right; }
+
+  /* Special sections (kept) */
+  .undertaking-card { background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); border: 1px solid #f59e0b; }
+  .undertaking-card .section-header { background: #f59e0b; color: white; }
+  .undertaking-text { background: rgba(245, 158, 11, 0.1); padding: 16px; border-radius: 12px; font-size: 14px; line-height: 1.6; margin-bottom: 20px; border-left: 4px solid #f59e0b; }
+  .signature-section { margin-top:16px; font-size:0; }
+  .signature-section .signature-field { display:inline-block; width:49%; font-size:14px; }
+  .signature-field { text-align:center; padding:20px; border:2px dashed #d1d5db; border-radius:12px; background:#fff; }
+  .signature-line { border-bottom:2px solid #d1d5db; width:200px; margin:10px auto; height:40px; }
+
+  /* Medical section (kept) */
+  .medical-card { background: #dbeafe; background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%); border: 1px solid #3b82f6; }
+  .medical-card .section-header { background: #3b82f6; color: white; }
+  .medical-group { margin-bottom: 20px; }
+  .medical-group-title { background: rgba(59, 130, 246, 0.1); padding: 12px 16px; border-radius: 8px; font-weight: 600; margin-bottom: 12px; border-left: 4px solid #3b82f6; }
+  .checkbox-field { padding:8px 12px; background:#fff; border-radius:8px; margin-bottom:6px; border:1px solid #e5e7eb; }
+  .checkbox-value { font-weight:600; color:#10b981; float:right; }
+
+  /* Footer (kept) */
+  .footer-info { background:#f3f4f6; padding:16px 20px; border-radius:12px; margin-top:30px; font-size:13px; color:#4b5563; }
+  .footer-info > div { display:inline-block; width:49%; vertical-align:top; }
+
+  /* Print optimizations (kept) */
+  @media print {
+    .field-group { display:block; margin-bottom:12px; }
+    .field-group .field { display:inline-block; vertical-align:top; width:48%; margin:0 2% 12px 0; }
+    .field-group .field:nth-child(2n) { margin-right:0; }
+    .field-group.single .field { display:block; width:100%; margin-right:0; }
+    .signature-section { display:block; }
+    .signature-section .signature-field { display:inline-block; width:48%; }
+    .status-badges { text-align:center; }
+    .status-badges .badge { display:inline-block; margin:2px 3px; }
+    .section-card { page-break-inside: avoid; box-shadow: none; border: 1px solid #ddd; }
+    .header-card { box-shadow: none; }
+  }
+
+  /* Icons using Unicode (kept) */
+  .icon-admission::before { content: "🎓"; }
+  .icon-person::before { content: "👤"; }
+  .icon-family::before { content: "👪"; }
+  .icon-education::before { content: "📚"; }
+  .icon-committee::before { content: "✅"; }
+  .icon-contract::before { content: "📋"; }
+  .icon-medical::before { content: "🏥"; }
+  /* Better numbers/phones: align LTR and mono spacing */
+.ac-num{ direction:ltr; unicode-bidi:plaintext; font-variant-numeric:tabular-nums; }
+/* Enhanced Personal Information Styles - Safe Version */
+.enhanced-field {
+    position: relative;
+    transition: all 0.3s ease;
+}
+
+.required-mark {
+    color: #dc2626;
+    font-weight: 700;
+    margin-right: 4px;
+}
+
+.field-filled {
+    border-left: 4px solid #059669;
+    background: #f0fdf4;
+}
+
+.field-empty {
+    border-left: 4px solid #d97706;
+    background: #fffbeb;
+}
+
+.field-validation {
+    color: #059669;
+    font-weight: 700;
+    margin-left: 8px;
+    font-size: 12px;
+}
+
+.empty-value {
+    color: #6b7280;
+    font-style: italic;
+    font-size: 14px;
+}
+
+.name-line {
+    margin-bottom: 6px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.lang-indicator {
+    background: #2563eb;
+    color: white;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 10px;
+    font-weight: 600;
+    min-width: 24px;
+    text-align: center;
+}
+
+.gender-badge {
+    padding: 4px 12px;
+    border-radius: 15px;
+    font-weight: 600;
+    font-size: 14px;
+}
+
+.gender-badge.male {
+    background: #dbeafe;
+    color: #1e40af;
+}
+
+.gender-badge.female {
+    background: #fce7f3;
+    color: #be185d;
+}
+
+.priority-field {
+    border: 2px solid #bfdbfe;
+}
+
+.email-value {
+    font-family: 'Courier New', monospace;
+    background: #f3f4f6;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 13px;
+}
+
+.id-badge {
+    background: #2563eb;
+    color: white;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.id-number {
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    font-family: 'Courier New', monospace;
+}
+
+.phone-number {
+    font-family: 'Courier New', monospace;
+    font-weight: 600;
+    background: #f3f4f6;
+    padding: 2px 6px;
+    border-radius: 4px;
+}
+
+.address-field {
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+}
+
+.address-container {
+    padding: 12px;
+}
+
+.address-lines {
+    line-height: 1.6;
+}
+
+.address-line {
+    margin-bottom: 6px;
+}
+
+.location-label {
+    color: #6b7280;
+    font-weight: 600;
+    margin-right: 6px;
+    font-size: 12px;
+}
+
+.date-value {
+    font-weight: 600;
+    color: #374151;
+}
+
+/* Print optimizations */
+@media print {
+    .enhanced-field {
+        page-break-inside: avoid;
+    }
+    
+    .field-filled, .field-empty {
+        border-left-width: 2px;
+    }
+}
+/* ===== Center all field labels + values (safe for wkhtmltopdf) ===== */
+.section-card .field-label{
+  text-align:center !important;      /* center the label text */
+  direction: rtl !important;         /* keep AR→EN order in bilingual labels */
+}
+
+.section-card .field-value{
+  text-align:center !important;      /* center values */
+  direction: unset !important;       /* let child spans control LTR/RTL */
+}
+
+/* Make common inline bits center nicely */
+.section-card .field-value .name-line{ justify-content:center; }
+.section-card .gender-badge,
+.section-card .email-value,
+.section-card .id-badge,
+.section-card .id-number,
+.section-card .phone-number,
+.section-card .ac-num{ display:inline-block; margin:0 auto; }
+
+/* Address block: keep lines centered too */
+.section-card .address-container,
+.section-card .address-lines,
+.section-card .address-line{ text-align:center; }
+/* Center the section title and hide any icon */
+.section-header { text-align:center; }
+.section-header .section-title { display:block; margin:0 auto; }
+.section-icon { display:none !important; }
+
+/* Two-column rows (explicit) */
+.field-row { font-size:0; } /* inline-block gap fix */
+.field-row .field{
+  display:inline-block; vertical-align:top;
+  width:48%; margin:0 2% 16px 0; font-size:14px;
+}
+.field-row .field:nth-child(2){ margin-right:0; }
+
+/* Optional: center any status badge below the title if present */
+.section-status { text-align:center; margin-top:6px; }
+/* --- Page control for wkhtmltopdf --- */
+@media print {
+  .pb { page-break-before: always !important; break-before: page; }
+  .keep { page-break-inside: avoid !important; break-inside: avoid-page; }
+}
+/* Hide the page-break markers in HTML preview */
+@media screen { .pb { display:none; } }
+  .ar-spaced{direction:rtl; unicode-bidi:plaintext; font-variant-ligatures:none;}
+
+        </style>
+
+
+        <!-- Use the shared content template -->
+        <t t-call="acmst_acceptance.acceptance_form_content"/>
+    </t>
+</t>
+</t>
+</template>
+
+<!-- Form content template (reusable) -->
+<template id="acceptance_form_content">
+<t t-foreach="docs" t-as="o">
+<!-- === Boxed bilingual banner === -->
+<table class="ac-banner">
+    <colgroup>
+        <col style="width:33%"/>
+        <col style="width:34%"/>
+        <col style="width:33%"/>
+    </colgroup>
+    <tr>
+        <!-- LEFT: Photo -->
+        <td class="left">
+            <div class="ac-photo-frame">
+                <t t-if="'photo' in o._fields and o.photo">
+                    <img class="ac-photo" t-att-src="'/web/image/acmst.acceptance.form/%s/photo' % o.id"/>
+                </t>
+                <t t-elif="'image_1920' in o._fields and o.image_1920">
+                    <img class="ac-photo" t-att-src="'/web/image/acmst.acceptance.form/%s/image_1920' % o.id"/>
+                </t>
+                <t t-else="">
+                    <div style="width:120px;height:120px;display:flex;align-items:center;justify-content:center;color:#9ca3af;">
+            No Photo
+                    </div>
+                </t>
+            </div>
+        </td>
+
+        <!-- CENTER: Status -->
+        <td class="center" style="vertical-align:middle;">
+            <div class="ac-badge">
+                <t t-if="o.admission_type == 'direct'">قبول مباشر</t>
+                <t t-elif="o.admission_type == 'general'">عام</t>
+                <t t-elif="o.admission_type == 'regular'">نظامي</t>
+                <t t-elif="o.admission_type == 'private'">خاص</t>
+                <t t-elif="o.admission_type == 'transfer'">تحويل</t>
+                <t t-elif="o.admission_type == 'bridging'">تجسير</t>
+                <t t-elif="o.admission_type == 'degree_holder'">حملة درجات علمية</t>
+                <t t-elif="o.admission_type == 'private_grant'">منح التعليم الأهلي</t>
+                <t t-else="">-</t>
+            </div>
+        </td>
+
+        <!-- RIGHT: QR -->
+        <td class="right">
+            <div class="ac-qr-wrap">
+                <t t-set="qr_value" t-value="'ACMST|ACC:%s|UID:%s' % (o.id, (o.university_id or ''))"/>
+                <img class="ac-qr" t-att-src="'/report/barcode/?type=QR&amp;value=%s&amp;width=120&amp;height=120' % qr_value"/>
+                <div class="ac-qr-label" t-esc="o.university_id or ('AF-%s' % o.id)"/>
+            </div>
+        </td>
+    </tr>
+</table>
+
+<!-- === Page control helpers (add once, near your other styles) === -->
+<style>
+  /* 2-column rows */
+  .field-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px;}
+  .field-row.single{grid-template-columns:1fr;}
+  /* Center section titles */
+  .section-header{display:flex;align-items:center;justify-content:center;padding:16px 20px;}
+  .section-title{margin:0;text-align:center;}
+  /* Page breaks for wkhtmltopdf */
+  @media print{
+    .pb{page-break-before:always !important;break-before:page;}
+    .keep{page-break-inside:avoid !important;break-inside:avoid-page;}
+  }
+  @media screen{ .pb{display:none;} }
+</style>
+
+<!-- ====================== PAGE 1 ====================== -->
+<!-- Personal Information -->
+<div class="section-card keep">
+    <div class="section-header">
+        <h2 class="section-title">البيانات الشخصية / Personal Information</h2>
+        <t t-if="'profile_completion_percentage' in o._fields and o.profile_completion_percentage">
+            <div class="section-status">
+                <span class="completion-badge">
+                    <t t-esc="o.profile_completion_percentage"/>
+% Complete
+                </span>
+            </div>
+        </t>
+    </div>
+
+    <div class="section-body">
+        <!-- Row 1: Full Name | Sex -->
+        <div class="field-row">
+            <!-- Full name -->
+            <div t-attf-class="field enhanced-field #{(o.full_name_ar or o.full_name_en) and 'field-filled' or 'field-empty'}">
+                <div class="field-label">
+                    <span class="required-mark">*</span> الاسم الرباعي — Full Name
+                    <span class="field-validation" t-if="o.full_name_ar and o.full_name_en">✓</span>
+                </div>
+                <div class="field-value">
+                    <t t-if="o.full_name_ar">
+                        <div class="name-line">
+                            <span class="lang-indicator">AR</span>
+                            <span dir="rtl" t-esc="o.full_name_ar"/>
+                        </div>
+                    </t>
+                    <t t-if="o.full_name_en">
+                        <div class="name-line">
+                            <span class="lang-indicator">EN</span>
+                            <span dir="ltr" t-esc="o.full_name_en"/>
+                        </div>
+                    </t>
+                    <t t-if="not (o.full_name_ar or o.full_name_en)">
+                        <span class="empty-value">Not provided</span>
+                    </t>
+                </div>
+            </div>
+
+            <!-- Sex -->
+            <div t-attf-class="field enhanced-field #{o.gender and 'field-filled' or 'field-empty'}">
+                <div class="field-label">
+                    <span class="required-mark">*</span> الجنس — Sex</div>
+                <div class="field-value">
+                    <t t-if="o.gender == 'male'">
+                        <span class="gender-badge male">ذكر — Male</span>
+                    </t>
+                    <t t-elif="o.gender == 'female'">
+                        <span class="gender-badge female">أنثى — Female</span>
+                    </t>
+                    <t t-else="">
+                        <span class="empty-value">Not specified</span>
+                    </t>
+                </div>
+            </div>
+        </div>
+
+        <!-- Row 2: Nationality | ID Type & Number -->
+        <div class="field-row">
+            <div t-attf-class="field enhanced-field #{o.nationality and 'field-filled' or 'field-empty'}">
+                <div class="field-label">
+                    <span class="required-mark">*</span> الجنسية — Nationality</div>
+                <div class="field-value">
+                    <t t-if="o.nationality">
+                        <span t-esc="o.nationality"/>
+                    </t>
+                    <t t-else="">
+                        <span class="empty-value">Not provided</span>
+                    </t>
+                </div>
+            </div>
+
+            <div t-attf-class="field enhanced-field #{o.document_number and 'field-filled' or 'field-empty'}">
+                <div class="field-label">
+                    <span class="required-mark">*</span> نوع/رقم الهوية — ID Type &amp; Number</div>
+                <div class="field-value">
+                    <t t-if="o.identification_document and o.document_number">
+                        <t t-if="o.identification_document == 'passport'">
+                            <span class="id-badge">Passport</span>
+                        </t>
+                        <t t-elif="o.identification_document">
+                            <span class="id-badge">National ID</span>
+                        </t>
+                        <t t-else="">
+                            <span class="id-badge">ID</span>
+                        </t>
+                        <span> — </span>
+                        <span dir="ltr" class="ac-num id-number" t-esc="o.document_number"/>
+                    </t>
+                    <t t-else="">
+                        <span class="empty-value">Not provided</span>
+                    </t>
+                </div>
+            </div>
+        </div>
+
+        <!-- Row 3: Date of Birth | Place of Birth -->
+        <div class="field-row">
+            <div t-attf-class="field enhanced-field #{o.birth_date and 'field-filled' or 'field-empty'}">
+                <div class="field-label">
+                    <span class="required-mark">*</span> تاريخ الميلاد — Date of Birth</div>
+                <div class="field-value">
+                    <t t-if="o.birth_date">
+                        <span class="date-value" t-out="o.birth_date" t-options='{"widget":"date"}'/>
+                    </t>
+                    <t t-else="">
+                        <span class="empty-value">Not provided</span>
+                    </t>
+                </div>
+            </div>
+
+            <div t-attf-class="field enhanced-field #{o.birth_place and 'field-filled' or 'field-empty'}">
+                <div class="field-label">مكان الميلاد — Place of Birth</div>
+                <div class="field-value">
+                    <t t-if="o.birth_place">
+                        <span t-esc="o.birth_place"/>
+                    </t>
+                    <t t-else="">
+                        <span class="empty-value">Not provided</span>
+                    </t>
+                </div>
+            </div>
+        </div>
+
+        <!-- Row 4: Email | Primary Phone -->
+        <div class="field-row">
+            <div t-attf-class="field enhanced-field #{o.email and 'field-filled' or 'field-empty'}">
+                <div class="field-label">
+                    <span class="required-mark">*</span> البريد الإلكتروني — Email</div>
+                <div class="field-value">
+                    <t t-if="o.email">
+                        <span dir="ltr" class="email-value" t-esc="o.email"/>
+                    </t>
+                    <t t-else="">
+                        <span class="empty-value">Not provided</span>
+                    </t>
+                </div>
+            </div>
+
+            <div t-attf-class="field enhanced-field #{o.phone1 and 'field-filled' or 'field-empty'}">
+                <div class="field-label">
+                    <span class="required-mark">*</span> هاتف أساسي — Primary Phone</div>
+                <div class="field-value">
+                    <t t-if="o.phone1">
+                        <span class="ac-num phone-number" dir="ltr" t-esc="o.phone1"/>
+                    </t>
+                    <t t-else="">
+                        <span class="empty-value">Not provided</span>
+                    </t>
+                </div>
+            </div>
+        </div>
+
+        <!-- Row 5: Secondary Phone | Address -->
+        <div class="field-row">
+            <div t-attf-class="field enhanced-field #{o.phone2 and 'field-filled' or 'field-empty'}">
+                <div class="field-label">هاتف ثانوي — Secondary Phone</div>
+                <div class="field-value">
+                    <t t-if="o.phone2">
+                        <span class="ac-num phone-number" dir="ltr" t-esc="o.phone2"/>
+                    </t>
+                    <t t-else="">
+                        <span class="empty-value">Optional</span>
+                    </t>
+                </div>
+            </div>
+
+            <div t-attf-class="field enhanced-field #{(o.address or o.city) and 'field-filled' or 'field-empty'}">
+                <div class="field-label">
+                    <span class="required-mark">*</span> العنوان — Address</div>
+                <div class="field-value address-container">
+                    <t t-if="o.address or o.city">
+                        <div class="address-lines">
+                            <t t-if="o.address">
+                                <div class="address-line">
+                                    <span dir="rtl" t-esc="o.address"/>
+                                </div>
+                            </t>
+                            <t t-if="o.city">
+                                <div class="address-line">
+                                    <span class="location-label">City:</span>
+                                    <span dir="ltr" t-esc="o.city"/>
+                                </div>
+                            </t>
+                        </div>
+                    </t>
+                    <t t-else="">
+                        <span class="empty-value">Address not provided</span>
+                    </t>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ====================== PAGE 2 (Admission + Guardian + Prior Education on SAME page) ====================== -->
+
+<!-- Admission Information -->
+<div class="section-card keep">
+    <div class="section-header">
+        <h2 class="section-title">بيانات القبول / Admission Information</h2>
+    </div>
+    <div class="section-body">
+        <!-- Row 1 -->
+        <div class="field-row">
+            <div t-attf-class="field enhanced-field #{o.university_id and 'field-filled' or 'field-empty'}">
+                <div class="field-label">الرقم الجامعي — University ID</div>
+                <div class="field-value">
+                    <span t-esc="o.university_id or '-'"/>
+                </div>
+            </div>
+            <div t-attf-class="field enhanced-field #{o.program_name and 'field-filled' or 'field-empty'}">
+                <div class="field-label">البرنامج — Program</div>
+                <div class="field-value">
+                    <span t-esc="o.program_name or '-'"/>
+                </div>
+            </div>
+        </div>
+
+        <!-- Row 2 -->
+        <div class="field-row">
+            <div t-attf-class="field enhanced-field #{o.college_name and 'field-filled' or 'field-empty'}">
+                <div class="field-label">الكلية — College</div>
+                <div class="field-value">
+                    <span t-esc="o.college_name or '-'"/>
+                </div>
+            </div>
+            <div t-attf-class="field enhanced-field #{o.academic_year and 'field-filled' or 'field-empty'}">
+                <div class="field-label">عام القبول — Admission Year</div>
+                <div class="field-value">
+                    <span t-esc="o.academic_year or '-'"/>
+                </div>
+            </div>
+        </div>
+
+        <!-- Row 3 -->
+        <div class="field-row">
+            <div t-attf-class="field enhanced-field #{(('graduation_certificate_type' in o._fields and o.graduation_certificate_type) or o.certificate_type) and 'field-filled' or 'field-empty'}">
+                <div class="field-label">نوع الشهادة — Certificate Type</div>
+                <div class="field-value">
+                    <t t-if="'graduation_certificate_type' in o._fields">
+                        <span t-esc="o.graduation_certificate_type or '-'"/>
+                    </t>
+                    <t t-else="">
+                        <span t-esc="o.certificate_type or '-'"/>
+                    </t>
+                </div>
+            </div>
+            <div t-attf-class="field enhanced-field #{(o.secondary_percentage is not False and o.secondary_percentage is not None) and 'field-filled' or 'field-empty'}">
+                <div class="field-label">نسبة الشهادة للثانوية — Secondary Certificate Percentage</div>
+                <div class="field-value">
+                    <t t-if="o.secondary_percentage is not False and o.secondary_percentage is not None">
+                        <span t-esc="o.secondary_percentage"/>
+                        <span>%</span>
+                    </t>
+                    <t t-else="">
+                        <span class="empty-value">-</span>
+                    </t>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Guardian Details -->
+<div class="section-card keep">
+    <div class="section-header">
+        <h2 class="section-title">بيانات ولي الأمر / Guardian Details</h2>
+    </div>
+    <div class="section-body">
+        <!-- Row 1 -->
+        <div class="field-row">
+            <div t-attf-class="field enhanced-field #{o.guardian_name and 'field-filled' or 'field-empty'}">
+                <div class="field-label">اسم ولي الأمر — Guardian Name</div>
+                <div class="field-value">
+                    <span t-esc="o.guardian_name or '-'"/>
+                </div>
+            </div>
+            <div t-attf-class="field enhanced-field #{o.guardian_relation and 'field-filled' or 'field-empty'}">
+                <div class="field-label">صلة القرابة — Relationship</div>
+                <div class="field-value">
+                    <span t-esc="o.guardian_relation or '-'"/>
+                </div>
+            </div>
+        </div>
+        <!-- Row 2 -->
+        <div class="field-row">
+            <div t-attf-class="field enhanced-field #{o.guardian_phone and 'field-filled' or 'field-empty'}">
+                <div class="field-label">هاتف — Phone</div>
+                <div class="field-value">
+                    <span class="ac-num" dir="ltr" t-esc="o.guardian_phone or '-'"/>
+                </div>
+            </div>
+            <div t-attf-class="field enhanced-field #{o.guardian_address and 'field-filled' or 'field-empty'}">
+                <div class="field-label">العنوان — Address</div>
+                <div class="field-value">
+                    <span t-esc="o.guardian_address or '-'"/>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- =============== PAGE 3 (Prior Education + Committee Panel) =============== -->
+<style>
+  /* keep if not already present */
+  .pb { page-break-before: always; }
+</style>
+<div class="pb"></div>
+
+<!-- Prior Education (Bridging/Transfer/Mature) -->
+<div class="section-card keep" style="page-break-before: always; break-before: page;">
+    <div class="section-header">
+        <h2 class="section-title" style="text-align:center;">
+            <span>بيانات المؤسسة التعليمية السابقة لِلْقَبول (التجسير + التحويل + الناضجين)</span>
+            <br/>
+            <span class="title-en">Prior Education</span>
+        </h2>
+    </div>
+
+    <div class="section-body">
+        <!-- Row 1 -->
+        <div class="field-row">
+            <div t-attf-class="field enhanced-field #{(('graduation_certificate_type' in o._fields and o.graduation_certificate_type) or o.certificate_type) and 'field-filled' or 'field-empty'}">
+                <div class="field-label">نوع شهادة التخرج — Graduation Certificate Type</div>
+                <div class="field-value">
+                    <t t-if="'graduation_certificate_type' in o._fields">
+                        <span t-esc="o.graduation_certificate_type or '-'"/>
+                    </t>
+                    <t t-else="">
+                        <span t-esc="o.certificate_type or '-'"/>
+                    </t>
+                </div>
+            </div>
+
+            <div t-attf-class="field enhanced-field #{o.secondary_school and 'field-filled' or 'field-empty'}">
+                <div class="field-label">مدرسة الشهادة — Secondary School</div>
+                <div class="field-value">
+                    <span t-esc="o.secondary_school or '-'"/>
+                </div>
+            </div>
+        </div>
+
+        <!-- Row 2 -->
+        <div class="field-row">
+            <div t-attf-class="field enhanced-field #{o.prev_inst_name and 'field-filled' or 'field-empty'}">
+                <div class="field-label">اسم المؤسسة — Institution Name</div>
+                <div class="field-value">
+                    <span t-esc="o.prev_inst_name or '-'"/>
+                </div>
+            </div>
+
+            <div t-attf-class="field enhanced-field #{o.prev_inst_program and 'field-filled' or 'field-empty'}">
+                <div class="field-label">الكلية/البرنامج/التخصص — College/Program/Major</div>
+                <div class="field-value">
+                    <span t-esc="o.prev_inst_program or '-'"/>
+                </div>
+            </div>
+        </div>
+
+        <!-- Row 3 -->
+        <div class="field-row">
+            <div t-attf-class="field enhanced-field #{o.prev_inst_years_completed and 'field-filled' or 'field-empty'}">
+                <div class="field-label">عدد السنوات الدراسية التي أكملها — Years Completed</div>
+                <div class="field-value">
+                    <span t-esc="o.prev_inst_years_completed or '-'"/>
+                </div>
+            </div>
+
+            <div t-attf-class="field enhanced-field #{o.prev_inst_join_year and 'field-filled' or 'field-empty'}">
+                <div class="field-label">عام الالتحاق بالمؤسسة — Year of Joining</div>
+                <div class="field-value">
+                    <span t-esc="o.prev_inst_join_year or '-'"/>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Committee Panel (print-blank, 2 columns, our style) -->
+<div class="section-card">
+    <div class="section-header">
+        <h2 class="section-title">خاص بلجنة المعاينة / Committee Panel</h2>
+    </div>
+
+    <div class="section-body committee-panel">
+        <style>
+      /* Scoped to this card */
+      .committee-panel .field-row{display:flex;gap:18px}
+      .committee-panel .field-row.single{display:block}
+      .committee-panel .field-row .field{flex:1;min-width:0}
+      .committee-panel .field-row.single .field{flex:none;width:100%}
+      .committee-panel .blank-line{display:block;height:28px;border-bottom:2px dashed #d1d5db;margin:6px 0}
+      .committee-panel .notes-box{height:120px;border:2px dashed #d1d5db;border-radius:12px;background:#fff}
+      .committee-panel .opt-row{display:flex;gap:18px;align-items:center;flex-wrap:wrap}
+      .committee-panel .opt{display:flex;align-items:center;gap:6px;font-weight:600;color:#374151}
+      .committee-panel .chk{width:16px;height:16px;border:2px solid #9ca3af;border-radius:3px;display:inline-block}
+      .committee-panel .field .field-value{padding:12px 14px}
+        </style>
+
+        <!-- Row 1 (FULL WIDTH): Date -->
+        <div class="field-row single">
+            <div class="field enhanced-field">
+                <div class="field-label">التاريخ — Date</div>
+                <div class="field-value">
+                    <span class="blank-line"></span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Row 2: Medical check | Committee recommendation -->
+        <div class="field-row">
+            <div class="field enhanced-field">
+                <div class="field-label">الكشف الطبي — Medical Check</div>
+                <div class="field-value">
+                    <div class="opt-row">
+                        <span class="opt">لائق                            <span class="chk"></span>
+                        </span>
+                        <span class="opt">غير لائق                            <span class="chk"></span>
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="field enhanced-field">
+                <div class="field-label">توصية اللجنة — Committee Recommendation</div>
+                <div class="field-value">
+                    <div class="opt-row">
+                        <span class="opt">مقبول                            <span class="chk"></span>
+                        </span>
+                        <span class="opt">غير مقبول                            <span class="chk"></span>
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Row 3: Notes & Chair -->
+        <div class="field-row">
+            <div class="field enhanced-field">
+                <div class="field-label">ملاحظات وتوقيع رئيس اللجنة — Notes &amp; Chair Signature</div>
+                <div class="field-value">
+                    <div class="notes-box"></div>
+                </div>
+            </div>
+
+            <div class="field enhanced-field">
+                <div class="field-label">اسم رئيس اللجنة — Committee Chair</div>
+                <div class="field-value">
+                    <span class="blank-line"></span>
+                    <div style="height:14px"></div>
+                    <div class="field-label" style="background:transparent;border:none;padding:0;color:#6b7280;">التوقيع — Signature</div>
+                    <span class="blank-line"></span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- =============== PAGE 4 (Program Coordinator Approval only) =============== -->
+<div class="pb"></div>
+
+<!-- Program Coordinator Approval (print-blank) - Page 4 only -->
+<div class="section-card" style="page-break-before: always; break-before: page; page-break-after: always; break-after: page;">
+    <div class="section-header">
+        <h2 class="section-title" style="text-align:center;">
+            <span style="direction:rtl; unicode-bidi:plaintext;">اعتماد منسق البرنامج</span>
+            <span style="direction:ltr; unicode-bidi:plaintext;"> / Program Coordinator Approval</span>
+        </h2>
+    </div>
+    <div class="section-body committee-panel">
+        <!-- Keep only if these helpers were NOT defined above -->
+        <style>
+      .committee-panel .opt-row{display:flex;gap:18px;align-items:center;flex-wrap:wrap}
+      .committee-panel .opt{display:flex;align-items:center;gap:6px;font-weight:600;color:#374151}
+      .committee-panel .chk{width:16px;height:16px;border:2px solid #9ca3af;border-radius:3px;display:inline-block}
+      .committee-panel .blank-line{display:block;height:28px;border-bottom:2px dashed #d1d5db;margin:6px 0}
+      .committee-panel .notes-box{height:100px;border:2px dashed #d1d5db;border-radius:12px;background:#fff}
+      .committee-panel .field .field-value{padding:12px 14px}
+        </style>
+
+        <!-- Decision -->
+        <div class="field-row single">
+            <div class="field enhanced-field">
+                <div class="field-label">قرار المنسق — Coordinator Decision</div>
+                <div class="field-value">
+                    <div class="opt-row" dir="rtl">
+                        <span class="opt">غير مقبول                            <span class="chk"></span>
+                        </span>
+                        <span class="opt">مقبول بدون مواد إستيفاء                            <span class="chk"></span>
+                        </span>
+                        <span class="opt">مقبول وعليه مواد الإستيفاء التالية                            <span class="chk"></span>
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Make-up subjects (only filled if chosen) -->
+        <div class="field-row">
+            <div class="field enhanced-field">
+                <div class="field-label">1.</div>
+                <div class="field-value">
+                    <span class="blank-line"></span>
+                </div>
+            </div>
+            <div class="field enhanced-field">
+                <div class="field-label">2.</div>
+                <div class="field-value">
+                    <span class="blank-line"></span>
+                </div>
+            </div>
+        </div>
+        <div class="field-row">
+            <div class="field enhanced-field">
+                <div class="field-label">3.</div>
+                <div class="field-value">
+                    <span class="blank-line"></span>
+                </div>
+            </div>
+            <div class="field enhanced-field">
+                <div class="field-label">4.</div>
+                <div class="field-value">
+                    <span class="blank-line"></span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Accepted level -->
+        <div class="field-row single">
+            <div class="field enhanced-field">
+                <div class="field-label">المستوى الدراسي المقبول به</div>
+                <div class="field-value">
+                    <div class="opt-row" dir="rtl">
+                        <span class="opt">الثاني                            <span class="chk"></span>
+                        </span>
+                        <span class="opt">الثالث                            <span class="chk"></span>
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Coordinator name | Date -->
+        <div class="field-row">
+            <div class="field enhanced-field">
+                <div class="field-label">اسم المنسق — Coordinator Name</div>
+                <div class="field-value">
+                    <span class="blank-line"></span>
+                </div>
+            </div>
+            <div class="field enhanced-field">
+                <div class="field-label">التاريخ — Date</div>
+                <div class="field-value">
+                    <span class="blank-line"></span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Signature | Notes -->
+        <div class="field-row">
+            <div class="field enhanced-field">
+                <div class="field-label">التوقيع — Signature</div>
+                <div class="field-value">
+                    <span class="blank-line"></span>
+                </div>
+            </div>
+            <div class="field enhanced-field">
+                <div class="field-label">ملاحظات — Notes</div>
+                <div class="field-value">
+                    <div class="notes-box"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- =============== PAGE 5 (Admission Steps & Guidelines in two columns) =============== -->
+<div class="pb"></div>
+
+<!-- Admission Steps & Guidelines (2 columns) - Page 5 -->
+<div class="section-card keep">
+    <div class="section-header">
+        <h2 class="section-title">خطوات وموجهات القبول / Admission Steps &amp; Guidelines</h2>
+    </div>
+
+    <div class="section-body">
+        <!-- local styles for this page only -->
+        <style>
+      .steps-two-col{display:flex; gap:18px; direction:rtl;}
+      .steps-two-col .col{flex:1; min-width:0; text-align:right; direction:rtl;}
+      .steps-two-col ul{margin:0; padding:0 18px 0 0; list-style:disc outside;}
+      .steps-two-col li{margin:8px 0; line-height:1.65}
+      @media print {.steps-two-col{gap:16px}}
+        </style>
+
+        <div class="steps-two-col">
+            <!-- RIGHT column: خطوات وموجهات القبول -->
+            <div class="col">
+                <ul>
+                    <li>إحضار أربع صور فوتوغرافية حديثة.</li>
+                    <li>إحضار الشهادة الثانوية أصل وصورة.</li>
+                    <li>إثبات الهوية رقم وطني / جواز سفر أصل وصورة.</li>
+                    <li>وجوب مراجعة البيانات الأساسية للطالب على الاستمارة بوضوح.</li>
+                    <li>على الطالب وولي الأمر التوقيع على التعهدات المرفقة مع استمارة التسجيل.</li>
+                    <li>تعبئة الإقرار الطبي.</li>
+                    <li>المتابعة لمعرفة مواعيد لجنة المعاينة.</li>
+                    <li>
+        على الطالب الحرص على إكمال الإجراءات والمستندات في الوقت المحدد
+        للتسجيل والمعلن من قبل إدارة الكلية، ويتحمل الطالب كامل المسؤولية
+        للإجراءات التي تتخذها الكلية في حالة نقص المستندات وعدم متابعة الإجراءات.
+                    </li>
+                    <li>
+        دفع المصروفات الدراسية ورسوم التسجيل وفق موجهات الإدارة المالية
+        المحدد للأقساط من قبل إدارة الكلية.
+                    </li>
+                </ul>
+            </div>
+
+            <!-- LEFT column: موجهات وإرشادات الإدارة المالية -->
+            <div class="col">
+                <ul>
+                    <li>على الطالب توريد المبلغ المالي باسمه والتأكد من صحة الاسم بالإيصالات المالية.</li>
+                    <li>
+        في حالة التأخر في السداد حسب البرمجة المعلنة يُحرم الطالب من دخول
+        الكلية ودخول المحاضرات والجلوس للامتحانات لحين استيفائه للسداد.
+                    </li>
+                    <li>
+        على الطالب الالتزام بالتوجيهات المعلنة من مكتب المسجل، وإرشادات المتابعة
+        والسلامة في جميع إجراءات هذه الإدارات.
+                    </li>
+                    <li>
+        على الطالب الاطلاع على جميع لوائح القبول والتسجيل وجميع بنود الإجراءات
+        الكلية من حيث القبول، التحويل، التسجيل، التجميد، الاستقالة، إلخ.
+                    </li>
+                    <li>يتوقف قبول الطالب على موافقة لجنة المعاينة.</li>
+                    <li>يتوقف القبول للناجحين والتحويل والتجسير على موافقة إدارة الكلية.</li>
+                    <li>
+        القبول للأهلي الأجنبي والدراسة العامة خاضع لاشتراطات وزارة التعليم العالي
+        والبحث العلمي واستيفاء متطلبات القبول بالكلية.
+                    </li>
+                    <li>رسوم التسجيل لا تُسترد.</li>
+                    <li>الرسوم الدراسية لا تُسترد بعد أسبوع من تاريخ السداد للتسجيل.</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- =============== PAGE 6 (Registration Steps & Financial Guidelines) =============== -->
+<div class="pb"></div>
+
+<!-- خطوات وموجهات التسجيل - Page 6 -->
+<div class="section-card keep" style="page-break-before: always; break-before: page;">
+    <div class="section-header">
+        <h2 class="section-title">خطوات وموجهات التسجيل</h2>
+    </div>
+    <div class="section-body">
+        <ul style="margin:0; padding:0 18px 0 0; list-style:disc outside; direction:rtl; text-align:right;">
+            <li>إكمال كافة متطلبات التسجيل في الفترة المقررة والتي لا تتخطى أسبوعين من تاريخ بداية الدراسة.</li>
+            <li>وجوب مراجعة البيانات الأساسية للطالب على الاستمارة بوضوح، وتجدد أرقام التواصل.</li>
+            <li>التواصل المستمر للطالب وولي الأمر.</li>
+            <li>دفع الرسوم الدراسية ورسوم التسجيل وفق موجهات الإدارة المالية.</li>
+            <li>إحضار أربع صور فوتوغرافية حديثة.</li>
+            <li>إحضار الشهادة الثانوية (أصل وصورة).</li>
+            <li>إثبات الهوية رقم وطني / جواز سفر (أصل وصورة).</li>
+            <li>على الطالب وولي الأمر التوقيع على التعهدات المرفقة مع استمارة التسجيل.</li>
+            <li>تعبئة الإقرار الطبي.</li>
+            <li>المتابعة لمعرفة مواعيد لجنة المعاينة.</li>
+            <li>على الطالب الحرص على إكمال الإجراءات والمستندات في الوقت المحدد للتسجيل والمعلن من قبل إدارة الكلية، ويتحمل الطالب كامل المسؤولية في حال نقص المستندات أو عدم متابعة الإجراءات.</li>
+        </ul>
+    </div>
+</div>
+
+<!-- موجهات وإرشادات الإدارة المالية - Page 6 -->
+<div class="section-card keep">
+    <div class="section-header">
+        <h2 class="section-title">موجهات وإرشادات الإدارة المالية</h2>
+    </div>
+    <div class="section-body">
+        <ul style="margin:0; padding:0 18px 0 0; list-style:disc outside; direction:rtl; text-align:right;">
+            <li>على الطالب توريد المبلغ المالي باسمه والتأكد من صحة الاسم في الإيصالات المالية.</li>
+            <li>الاحتفاظ بالإيصال المالي؛ إذ يُعدّ الدليل الوحيد للسداد.</li>
+            <li>في حالة السداد عبر البنك، إحضار صورة إشعار الإضافة إلى الحساب.</li>
+            <li>لا يُعدّ سداداً بدون هذا الإشعار.</li>
+            <li>التأخر عن السداد حسب البرمجة المعلنة يَحرم الطالب من دخول الكلية ودخول المحاضرات والجلوس للامتحانات لحين استيفاء السداد.</li>
+            <li>الالتزام بالتوجيهات المعلنة من مكتب المسجل، والإرشادات والمتابعة والسلامة في جميع إجراءات هذه الإدارات.</li>
+            <li>الاطلاع على لوائح القبول والتسجيل وكافة بنود الإجراءات (تجميد، استقالة... إلخ).</li>
+            <li>قبول الطالب على موافقة لجنة المعاينة.</li>
+            <li>يتوقف القبول للناجحين والتحويل والتجسير على موافقة إدارة الكلية.</li>
+            <li>القبول للأهلي الأجنبي والدارسة العامة خاضع لاشتراطات وزارة التعليم العالي والبحث العلمي واستيفاء متطلبات القبول بالكلية.</li>
+            <li>رسوم التسجيل لا تُسترد.</li>
+            <li>الرسوم الدراسية لا تُسترد بعد أسبوع من تاريخ السداد.</li>
+            <li>لا تُعتمد رسوم دفعة القبول في حالة التجميد لعام دراسي واحد، وفي حالة التجميد لأكثر من عام تُعتمد رسوم العام الجديد.</li>
+        </ul>
+    </div>
+</div>
+
+<!-- =============== PAGE 7 (Undertaking Section only) =============== -->
+<div class="pb"></div>
+
+<!-- Undertaking Section (updated content only; same design/colors) -->
+<div class="section-card undertaking-card" style="page-break-before: always; break-before: page; page-break-after: always; break-after: page;">
+    <div class="section-header">
+        <div class="section-icon icon-contract"></div>
+        <h2 class="section-title">تعهد — Undertaking</h2>
+    </div>
+
+    <div class="section-body">
+        <!-- local styling for the check-list, scoped to this card -->
+        <style>
+     .undertaking-card .pledge-intro{font-weight:700; margin-bottom:10px; text-align:right; direction:rtl;}
+
+  /* Use native bullets instead of a custom ✔ icon */
+  .undertaking-card .pledge-list{
+    list-style: disc outside;   /* dot bullets */
+    margin: 0;
+    padding: 0 18px 0 0;        /* indent on the RIGHT for RTL */
+    direction: rtl;
+    text-align: right;
+  }
+
+  .undertaking-card .pledge-list li{
+    margin: 8px 0;
+    line-height: 1.75;
+  }
+
+  /* Kill the old checkmark */
+  .undertaking-card .pledge-list li:before{
+    content: none !important;
+  }
+
+  @media print { .undertaking-card .pledge-list li{margin:6px 0;} }
+        </style>
+
+        <div class="undertaking-text">
+            <!-- Student Name and Program Section -->
+            <div style="margin-bottom: 20px; text-align: right; direction: rtl;">
+                <div style="margin-bottom: 10px;">
+                    <span style="font-weight: bold;">أنا الطالب/ـة.</span>
+                    <div style="border-bottom: 1px solid #000; width: 200px; display: inline-block; margin-right: 10px; margin-left: 10px;"></div>
+                </div>
+                <div>
+                    <span style="font-weight: bold;">ببرنامج</span>
+                    <div style="border-bottom: 1px solid #000; width: 200px; display: inline-block; margin-right: 10px; margin-left: 10px;"></div>
+                </div>
+            </div>
+
+            <div class="pledge-intro">أتعهد أنا الطالب/ـة بالالتزام بالآتي:</div>
+            <ul class="pledge-list">
+                <li>الالتزام التام بالقوانين واللوائح والأنظمة بالكلية.</li>
+                <li>بذل قصارى جهدي في أداء واجباتي الأكاديمية والتحصيل العلمي.</li>
+                <li>المحافظة على الوقت والانضباط في الحضور ومواعيد الدراسة.</li>
+                <li>المحافظة على ممتلكات الكلية ومعداتها وأجهزتها والتعامل معها بعناية.</li>
+                <li>الالتزام بالزيّ/اللبس اللائق الذي تقره الكلية.</li>
+                <li>عدم ممارسة الأنشطة السياسية أو الانضمام إلى جماعات على أساس ديني أو مذهبي أو عقائدي داخل حرم الكلية.</li>
+                <li>الامتناع تمامًا عن التدخين وتعاطي التبغ وكافة المواد/المنبهات الممنوعة داخل الحرم بما فيه القاعات والمكتبة والمعامل.</li>
+                <li>الوفاء بالالتزامات المالية تجاه الكلية في المواعيد المحددة.</li>
+                <li>عدم إدخال أو حمل أي أدوات أو مواد حادة أو خطرة داخل حرم الكلية.</li>
+                <li>عدم إدخال أجهزة أو مواد غير مصرّح بها إلى القاعات أو المعامل والالتزام بإجراءات السلامة.</li>
+                <li>عدم اللجوء للعنف أو الإساءة أو الألفاظ النابية، واحترام جميع منسوبي الكلية وزملائي.</li>
+                <li>الامتناع عن إثارة الشغب أو التحريض أو تعطيل الدراسة أو الامتحانات.</li>
+                <li>الالتزام بالأخلاق العامة والآداب داخل الحرم وخلال الأنشطة المرتبطة بالكلية خارجه.</li>
+                <li>استخدام الهاتف والإنترنت ووسائل التواصل وفق سياسات الكلية وعدم إساءة الاستخدام.</li>
+                <li>الإبلاغ الفوري عن أي حادث أو حالة صحية طارئة أو ملاحظة تُهدد السلامة داخل الحرم.</li>
+                <li>إخطار الكلية بأي تغيير في بياناتي الأساسية أو وسائل التواصل.</li>
+                <li>تحمّل الجزاءات التأديبية المقررة نظامًا عند مخالفة أي من البنود أعلاه، بما في ذلك الفصل في حالات سوء السلوك الجسيم.</li>
+            </ul>
+        </div>
+
+        <div class="signature-section">
+            <div class="signature-field">
+                <div class="field-label">توقيع الطالب — Student Signature</div>
+                <div class="signature-line"></div>
+            </div>
+            <div class="signature-field">
+                <div class="field-label">توقيع ولي الأمر — Guardian Signature</div>
+                <div class="signature-line"></div>
+            </div>
+        </div>
+
+        <div class="field-group" style="margin-top: 20px;">
+            <div class="field">
+                <div class="field-label">التاريخ — Date</div>
+                <div class="field-value" t-esc="'-'"/>
+            </div>
+            <div class="field">
+                <div class="field-label">مكان التوقيع — Place</div>
+                <div class="field-value" t-esc="o.signature_place or '-'"/>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- =============== PAGE 8 (Medical Declaration - Arabic) =============== -->
+<div class="pb"></div>
+
+<!-- Medical Declaration Section (Arabic) - Page 8 -->
+<div class="section-card medical-card" style="page-break-before: always; break-before: page;">
+    <div class="section-header">
+        <div class="section-icon icon-medical"></div>
+        <h2 class="section-title">استمارة الإقرار الطبي</h2>
+    </div>
+
+    <!-- ===== Top segmented header (Date + University ID) ===== -->
+    <div class="med-top" style="page-break-inside: avoid;">
+        <style>
+    .med-top .med-head{width:100%; border-collapse:collapse; margin:0 0 6px 0;}
+    .med-top .med-head td{border:1px solid #111827; padding:8px; vertical-align:middle;}
+    .med-top .seg{display:flex; align-items:center; justify-content:space-between;}
+    .med-top .seg.rtl{direction:rtl; text-align:right;}
+    .med-top .seg-label{font-weight:700; white-space:nowrap; margin-left:6px; font-size:13px;}
+    .med-top .seg-boxes{display:inline-flex; gap:3px; align-items:center; direction:ltr;}
+    .med-top .seg-box{width:18px; height:18px; border:1px solid #111827; display:inline-block; background:#fff;}
+    .med-top .seg-slash{padding:0 4px; font-weight:700; font-size:13px;}
+    .med-top .med-divider{height:2px; background:#7c1d2c; margin:8px 0 12px; border-radius:1px;}
+    @media print { 
+        .med-top .seg-box{width:16px; height:16px;} 
+        .med-top .seg-label{font-size:12px;}
+    }
+        </style>
+
+        <table class="med-head">
+            <tr>
+                <!-- Left cell: University ID (label RTL, boxes LTR) -->
+                <td style="width:50%;">
+                    <div class="seg rtl">
+                        <span class="seg-label">الرقم الجامعي</span>
+                        <div class="seg-boxes">
+                            <span class="seg-box"></span>
+                            <span class="seg-box"></span>
+                            <span class="seg-box"></span>
+                            <span class="seg-box"></span>
+                            <span class="seg-box"></span>
+                            <span class="seg-box"></span>
+                            <span class="seg-box"></span>
+                            <span class="seg-box"></span>
+                            <span class="seg-box"></span>
+                            <span class="seg-box"></span>
+                        </div>
+                    </div>
+                </td>
+
+                <!-- Right cell: Date DD/MM/YYYY -->
+                <td style="width:50%;">
+                    <div class="seg rtl">
+                        <span class="seg-label">التاريخ</span>
+                        <div class="seg-boxes">
+                            <span class="seg-box"></span>
+                            <span class="seg-box"></span>
+                            <span class="seg-slash">/</span>
+                            <span class="seg-box"></span>
+                            <span class="seg-box"></span>
+                            <span class="seg-slash">/</span>
+                            <span class="seg-box"></span>
+                            <span class="seg-box"></span>
+                            <span class="seg-box"></span>
+                            <span class="seg-box"></span>
+                        </div>
+                    </div>
+                </td>
+            </tr>
+        </table>
+
+        <!-- Thin maroon divider below header -->
+        <div class="med-divider"></div>
+    </div>
+
+    <div class="section-body">
+
+        <!-- Scoped styles for the blank form rows -->
+        <style>
+      /* Match the same font family as the rest of the form */
+  .med-blank-table{
+    width:100%; border-collapse:collapse; direction:rtl; text-align:right;
+    margin: 0 0 10px 0;
+    font-family: "Almarai", "DejaVu Sans", "Noto Naskh Arabic", Tahoma, Arial, sans-serif;
+  }
+  .med-blank-table th, .med-blank-table td{
+    border:1px solid #3b82f6; padding:8px 10px;
+  }
+  .med-blank-table th{
+    background: rgba(59,130,246,0.10); /* same soft blue */
+    font-weight:700; font-size:12px; white-space:nowrap; width:180px;
+  }
+  .med-blank-table .line{
+    display:block; height:20px; border-bottom:1px dashed #9ca3af;
+  }
+  @media print{
+    .med-blank-table .line{ height:18px; }
+  }
+      
+        </style>
+
+        <table class="med-blank-table">
+            <tr>
+                <th>اسم البرنامج</th>
+                <td>
+                    <span class="line"></span>
+                </td>
+            </tr>
+            <tr>
+                <th>اسم الطالب رباعي</th>
+                <td>
+                    <span class="line"></span>
+                </td>
+            </tr>
+            <tr>
+                <th>الجنسية</th>
+                <td>
+                    <span class="line"></span>
+                </td>
+            </tr>
+        </table>
+        <!-- ===== Medical Questionnaire (clean Yes/No layout) ===== -->
+        <div class="medical-questionnaire" style="page-break-inside: avoid;">
+            <style>
+    .medical-questionnaire .med-table{
+      width:100%; border-collapse:collapse; table-layout:fixed; direction:rtl; font-size:12px;
+      margin:15px 0;
+    }
+    .medical-questionnaire .med-table th,
+    .medical-questionnaire .med-table td{
+      border:1px solid #111827; padding:8px 10px; vertical-align:top;
+    }
+    /* header */
+    .medical-questionnaire .hdr th{ 
+      background:#3b82f6; 
+      color:#fff; 
+      font-weight:700; 
+      text-align:center; 
+      font-size:13px;
+      padding:10px 8px;
+    }
+    /* section instruction cell */
+    .medical-questionnaire .muted{ 
+      background:#e5e7eb; 
+      font-weight:700; 
+      text-align:center; 
+      font-size:11px;
+      color:#374151;
+    }
+    /* columns */
+    .medical-questionnaire .q{ 
+      text-align:right; 
+      direction:rtl; 
+      font-size:12px;
+      line-height:1.3;
+    }
+    .medical-questionnaire .yn, .medical-questionnaire .no{ 
+      width:8%; 
+      text-align:center; 
+      background:#f8fafc;
+    }
+    .medical-questionnaire .notes{ 
+      text-align:right; 
+      background:#f8fafc;
+    }
+    /* check box for handwriting */
+    .medical-questionnaire .box{ 
+      display:inline-block; 
+      width:14px; 
+      height:14px; 
+      border:1px solid #111827; 
+      border-radius:2px; 
+      background:#fff;
+      margin:0 auto;
+    }
+    /* row height for handwriting space */
+    .medical-questionnaire .pad{ 
+      height:32px; 
+      vertical-align:middle;
+    }
+    /* Section headers */
+    .medical-questionnaire .section-header{
+      background:#f1f5f9;
+      font-weight:700;
+      font-size:13px;
+      color:#1e40af;
+    }
+    @media print{
+      .medical-questionnaire .pad{ height:28px; }
+      .medical-questionnaire .box{ width:12px; height:12px; }
+      .medical-questionnaire .med-table{ font-size:11px; }
+    }
+            </style>
+
+            <table class="med-table">
+                <colgroup>
+                    <!-- السؤال | نعم | لا | التوضيح/الملاحظات -->
+                    <col style="width:42%"/>
+                    <col style="width:10%"/>
+                    <col style="width:10%"/>
+                    <col style="width:38%"/>
+                </colgroup>
+
+                <!-- Header row -->
+                <tr class="hdr">
+                    <th>السؤال</th>
+                    <th>نعم</th>
+                    <th>لا</th>
+                    <th>التوضيح / الملاحظات</th>
+                </tr>
+
+                <!-- ===== Section A ===== -->
+                <tr class="section-header">
+                    <td class="q">
+                        <strong>أ. هل تعاني من مرض</strong>
+                    </td>
+                    <td class="yn"></td>
+                    <td class="no"></td>
+                    <td class="muted">في حالة الإجابة بـ نعم ما نوع الدواء المستخدم</td>
+                </tr>
+                <tr>
+                    <td class="q">1. السكري؟</td>
+                    <td class="yn pad">
+                        <span class="box"></span>
+                    </td>
+                    <td class="no pad">
+                        <span class="box"></span>
+                    </td>
+                    <td class="notes pad"></td>
+                </tr>
+                <tr>
+                    <td class="q">2. ضغط الدم؟</td>
+                    <td class="yn pad">
+                        <span class="box"></span>
+                    </td>
+                    <td class="no pad">
+                        <span class="box"></span>
+                    </td>
+                    <td class="notes pad"></td>
+                </tr>
+                <tr>
+                    <td class="q">3. الربو الشعبي؟</td>
+                    <td class="yn pad">
+                        <span class="box"></span>
+                    </td>
+                    <td class="no pad">
+                        <span class="box"></span>
+                    </td>
+                    <td class="notes pad"></td>
+                </tr>
+                <tr>
+                    <td class="q">4. التهاب الكبد الوبائي؟</td>
+                    <td class="yn pad">
+                        <span class="box"></span>
+                    </td>
+                    <td class="no pad">
+                        <span class="box"></span>
+                    </td>
+                    <td class="notes pad"></td>
+                </tr>
+
+                <!-- ===== Section B ===== -->
+                <tr class="section-header">
+                    <td class="q">
+                        <strong>ب. هل تعاني من</strong>
+                    </td>
+                    <td class="yn"></td>
+                    <td class="no"></td>
+                    <td class="muted">في حالة الإجابة بـ نعم فحدد</td>
+                </tr>
+                <tr>
+                    <td class="q">1. أي مرض من أمراض القلب؟</td>
+                    <td class="yn pad">
+                        <span class="box"></span>
+                    </td>
+                    <td class="no pad">
+                        <span class="box"></span>
+                    </td>
+                    <td class="notes pad"></td>
+                </tr>
+                <tr>
+                    <td class="q">2. إعاقة جسدية؟</td>
+                    <td class="yn pad">
+                        <span class="box"></span>
+                    </td>
+                    <td class="no pad">
+                        <span class="box"></span>
+                    </td>
+                    <td class="notes pad"></td>
+                </tr>
+                <tr>
+                    <td class="q">3. أي مرض نفسي؟</td>
+                    <td class="yn pad">
+                        <span class="box"></span>
+                    </td>
+                    <td class="no pad">
+                        <span class="box"></span>
+                    </td>
+                    <td class="notes pad"></td>
+                </tr>
+                <tr>
+                    <td class="q">4. أي مرض آخر؟</td>
+                    <td class="yn pad">
+                        <span class="box"></span>
+                    </td>
+                    <td class="no pad">
+                        <span class="box"></span>
+                    </td>
+                    <td class="notes pad"></td>
+                </tr>
+
+                <!-- ===== Section C ===== -->
+                <tr class="section-header">
+                    <td class="q">
+                        <strong>ج. هل</strong>
+                    </td>
+                    <td class="yn"></td>
+                    <td class="no"></td>
+                    <td class="muted">في حالة الإجابة بـ نعم وضّح</td>
+                </tr>
+                <tr>
+                    <td class="q">1. لزمت سرير المستشفى من قبل؟</td>
+                    <td class="yn pad">
+                        <span class="box"></span>
+                    </td>
+                    <td class="no pad">
+                        <span class="box"></span>
+                    </td>
+                    <td class="notes pad"></td>
+                </tr>
+                <tr>
+                    <td class="q">2. أُجريت لك أي عملية جراحية؟</td>
+                    <td class="yn pad">
+                        <span class="box"></span>
+                    </td>
+                    <td class="no pad">
+                        <span class="box"></span>
+                    </td>
+                    <td class="notes pad"></td>
+                </tr>
+            </table>
+        </div>
+        <!-- Acknowledgment + Signature (right-aligned + maroon divider below) -->
+        <div class="med-ack" style="page-break-inside: avoid;">
+            <style>
+    .med-ack .ack-box{
+      width:70%;
+      margin:0 0 8px auto;                  /* push to the RIGHT */
+      border:1px solid #3b82f6;              /* match medical card accent */
+      border-radius:6px;
+      padding:10px 12px;
+      /* same background as .medical-card */
+      background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+      direction:rtl; text-align:right;
+    }
+    .med-ack .ack-text{ font-weight:700; line-height:1.5; margin-bottom:8px; font-size:12px; }
+    .med-ack .ack-row{ display:flex; align-items:center; gap:8px; }
+    .med-ack .ack-label{ font-weight:700; white-space:nowrap; font-size:12px; }
+    .med-ack .ack-line{ flex:1; height:18px; display:block; border-bottom:1px dashed #9ca3af; }
+    .med-ack .med-divider{ height:2px; background:#7c1d2c; } /* maroon line below */
+    @media print { .med-ack .ack-line{ height:16px; } }
+            </style>
+
+            <div class="ack-box">
+                <div class="ack-text">أنا الطالب أعلاه، أقر بصحة البيانات في الاستمارة.</div>
+                <div class="ack-row">
+                    <span class="ack-label">التوقيع:</span>
+                    <span class="ack-line"></span>
+                </div>
+            </div>
+
+            <div class="med-divider"></div>
+        </div>
+
+    </div>
+</div>
+
+<!-- =============== PAGE 9 (Medical Declaration - English) =============== -->
+<div class="pb"></div>
+
+<!-- Medical Declaration Section (English) - Page 9 -->
+<div class="section-card medical-card" style="page-break-before: always; break-before: page;">
+    <div class="section-header">
+        <div class="section-icon icon-medical"></div>
+        <h2 class="section-title">Medical Declaration Form</h2>
+    </div>
+
+    <!-- Top segmented header (University ID + Date) -->
+    <div class="med-top en" style="page-break-inside: avoid;">
+        <style>
+    .med-top.en .med-head{width:100%; border-collapse:collapse; margin:0 0 6px 0;}
+    .med-top.en .med-head td{border:1px solid #111827; padding:8px; vertical-align:middle;}
+    .med-top.en .seg{display:flex; align-items:center; justify-content:space-between; direction:ltr; text-align:left;}
+    .med-top.en .seg-label{font-weight:700; white-space:nowrap; margin-right:6px; font-size:13px;}
+    .med-top.en .seg-boxes{display:inline-flex; gap:3px; align-items:center; direction:ltr;}
+    .med-top.en .seg-box{width:18px; height:18px; border:1px solid #111827; display:inline-block; background:#fff;}
+    .med-top.en .seg-slash{padding:0 4px; font-weight:700; font-size:13px;}
+    .med-top.en .med-divider{height:2px; background:#7c1d2c; margin:8px 0 12px; border-radius:1px;}
+    @media print { 
+        .med-top.en .seg-box{width:16px; height:16px;} 
+        .med-top.en .seg-label{font-size:12px;}
+    }
+        </style>
+
+        <table class="med-head">
+            <tr>
+                <td>
+                    <div class="seg">
+                        <span class="seg-label">University ID</span>
+                        <div class="seg-boxes">
+                            <!-- 10 slots (adjust if your ID length differs) -->
+                            <span class="seg-box"></span>
+                            <span class="seg-box"></span>
+                            <span class="seg-box"></span>
+                            <span class="seg-box"></span>
+                            <span class="seg-box"></span>
+                            <span class="seg-box"></span>
+                            <span class="seg-box"></span>
+                            <span class="seg-box"></span>
+                            <span class="seg-box"></span>
+                            <span class="seg-box"></span>
+                        </div>
+                    </div>
+                </td>
+                <td>
+                    <div class="seg">
+                        <span class="seg-label">Date</span>
+                        <div class="seg-boxes">
+                            <!-- D D / M M / Y Y Y Y -->
+                            <span class="seg-box"></span>
+                            <span class="seg-box"></span>
+                            <span class="seg-slash">/</span>
+                            <span class="seg-box"></span>
+                            <span class="seg-box"></span>
+                            <span class="seg-slash">/</span>
+                            <span class="seg-box"></span>
+                            <span class="seg-box"></span>
+                            <span class="seg-box"></span>
+                            <span class="seg-box"></span>
+                        </div>
+                    </div>
+                </td>
+            </tr>
+        </table>
+
+        <div class="med-divider"></div>
+    </div>
+
+    <div class="section-body">
+
+        <!-- Blank info rows (same look; left for handwriting) -->
+        <style>
+      .med-blank.en{ direction:ltr; text-align:left; }
+      .med-blank.en .row{
+        display:grid; grid-template-columns:180px 1fr;
+        border:1px solid #3b82f6; border-bottom:0;
+        margin-bottom:2px;
+      }
+      .med-blank.en .row:last-child{ border-bottom:1px solid #3b82f6; }
+      .med-blank.en .label{
+        background:rgba(59,130,246,0.10); padding:8px 10px; font-weight:700; font-size:12px;
+      }
+      .med-blank.en .box{ padding:8px 10px; }
+      .med-blank.en .line{ display:block; height:20px; border-bottom:1px dashed #9ca3af; }
+      @media print { .med-blank.en .line{ height:18px; } }
+        </style>
+
+        <div class="med-blank en">
+            <div class="row">
+                <div class="label">Program Name</div>
+                <div class="box">
+                    <span class="line"></span>
+                </div>
+            </div>
+            <div class="row">
+                <div class="label">Student Full Name (four parts)</div>
+                <div class="box">
+                    <span class="line"></span>
+                </div>
+            </div>
+            <div class="row">
+                <div class="label">Nationality</div>
+                <div class="box">
+                    <span class="line"></span>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== Medical Questionnaire (English, clean Yes/No layout) ===== -->
+        <div class="medical-questionnaire en" style="page-break-inside: avoid;">
+            <style>
+        .medical-questionnaire.en .med-table{
+          width:100%; border-collapse:collapse; table-layout:fixed; direction:ltr; font-size:12px;
+          margin:15px 0;
+        }
+        .medical-questionnaire.en .med-table th,
+        .medical-questionnaire.en .med-table td{
+          border:1px solid #111827; padding:8px 10px; vertical-align:top;
+        }
+        .medical-questionnaire.en .hdr th{ 
+          background:#3b82f6; 
+          color:#fff; 
+          font-weight:700; 
+          text-align:center; 
+          font-size:13px;
+          padding:10px 8px;
+        }
+        .medical-questionnaire.en .muted{ 
+          background:#e5e7eb; 
+          font-weight:700; 
+          text-align:center; 
+          font-size:11px;
+          color:#374151;
+        }
+        .medical-questionnaire.en .q{ 
+          text-align:left; 
+          direction:ltr; 
+          font-size:12px;
+          line-height:1.3;
+        }
+        .medical-questionnaire.en .yn, .medical-questionnaire.en .no{ 
+          width:8%; 
+          text-align:center; 
+          background:#f8fafc;
+        }
+        .medical-questionnaire.en .notes{ 
+          text-align:left; 
+          background:#f8fafc;
+        }
+        .medical-questionnaire.en .box{ 
+          display:inline-block; 
+          width:14px; 
+          height:14px; 
+          border:1px solid #111827; 
+          border-radius:2px; 
+          background:#fff;
+          margin:0 auto;
+        }
+        .medical-questionnaire.en .pad{ 
+          height:32px; 
+          vertical-align:middle;
+        }
+        .medical-questionnaire.en .section-header{
+          background:#f1f5f9;
+          font-weight:700;
+          font-size:13px;
+          color:#1e40af;
+        }
+        @media print{
+          .medical-questionnaire.en .pad{ height:28px; }
+          .medical-questionnaire.en .box{ width:12px; height:12px; }
+          .medical-questionnaire.en .med-table{ font-size:11px; }
+        }
+            </style>
+
+            <table class="med-table">
+                <colgroup>
+                    <col style="width:42%"/>
+                    <col style="width:10%"/>
+                    <col style="width:10%"/>
+                    <col style="width:38%"/>
+                </colgroup>
+                <tr class="hdr">
+                    <th>Question</th>
+                    <th>Yes</th>
+                    <th>No</th>
+                    <th>Clarification / Notes</th>
+                </tr>
+
+                <!-- Section A -->
+                <tr class="section-header">
+                    <td class="q">
+                        <strong>A. Do you suffer from any disease?</strong>
+                    </td>
+                    <td class="yn"></td>
+                    <td class="no"></td>
+                    <td class="muted">If yes, what medication do you use?</td>
+                </tr>
+                <tr>
+                    <td class="q">1. Diabetes?</td>
+                    <td class="yn pad">
+                        <span class="box"></span>
+                    </td>
+                    <td class="no pad">
+                        <span class="box"></span>
+                    </td>
+                    <td class="notes pad"></td>
+                </tr>
+                <tr>
+                    <td class="q">2. Hypertension?</td>
+                    <td class="yn pad">
+                        <span class="box"></span>
+                    </td>
+                    <td class="no pad">
+                        <span class="box"></span>
+                    </td>
+                    <td class="notes pad"></td>
+                </tr>
+                <tr>
+                    <td class="q">3. Bronchial asthma?</td>
+                    <td class="yn pad">
+                        <span class="box"></span>
+                    </td>
+                    <td class="no pad">
+                        <span class="box"></span>
+                    </td>
+                    <td class="notes pad"></td>
+                </tr>
+                <tr>
+                    <td class="q">4. Viral hepatitis?</td>
+                    <td class="yn pad">
+                        <span class="box"></span>
+                    </td>
+                    <td class="no pad">
+                        <span class="box"></span>
+                    </td>
+                    <td class="notes pad"></td>
+                </tr>
+
+                <!-- Section B -->
+                <tr class="section-header">
+                    <td class="q">
+                        <strong>B. Do you have any of the following?</strong>
+                    </td>
+                    <td class="yn"></td>
+                    <td class="no"></td>
+                    <td class="muted">If yes, please specify.</td>
+                </tr>
+                <tr>
+                    <td class="q">1. Heart disease?</td>
+                    <td class="yn pad">
+                        <span class="box"></span>
+                    </td>
+                    <td class="no pad">
+                        <span class="box"></span>
+                    </td>
+                    <td class="notes pad"></td>
+                </tr>
+                <tr>
+                    <td class="q">2. Physical disability?</td>
+                    <td class="yn pad">
+                        <span class="box"></span>
+                    </td>
+                    <td class="no pad">
+                        <span class="box"></span>
+                    </td>
+                    <td class="notes pad"></td>
+                </tr>
+                <tr>
+                    <td class="q">3. Psychiatric illness?</td>
+                    <td class="yn pad">
+                        <span class="box"></span>
+                    </td>
+                    <td class="no pad">
+                        <span class="box"></span>
+                    </td>
+                    <td class="notes pad"></td>
+                </tr>
+                <tr>
+                    <td class="q">4. Any other disease?</td>
+                    <td class="yn pad">
+                        <span class="box"></span>
+                    </td>
+                    <td class="no pad">
+                        <span class="box"></span>
+                    </td>
+                    <td class="notes pad"></td>
+                </tr>
+
+                <!-- Section C -->
+                <tr class="section-header">
+                    <td class="q">
+                        <strong>C. Have you ever…</strong>
+                    </td>
+                    <td class="yn"></td>
+                    <td class="no"></td>
+                    <td class="muted">If yes, please explain.</td>
+                </tr>
+                <tr>
+                    <td class="q">1. Been hospitalized before?</td>
+                    <td class="yn pad">
+                        <span class="box"></span>
+                    </td>
+                    <td class="no pad">
+                        <span class="box"></span>
+                    </td>
+                    <td class="notes pad"></td>
+                </tr>
+                <tr>
+                    <td class="q">2. Undergone any surgery?</td>
+                    <td class="yn pad">
+                        <span class="box"></span>
+                    </td>
+                    <td class="no pad">
+                        <span class="box"></span>
+                    </td>
+                    <td class="notes pad"></td>
+                </tr>
+            </table>
+        </div>
+
+        <!-- Acknowledgment + Signature (same blue background & maroon divider) -->
+        <div class="med-ack en" style="page-break-inside: avoid;">
+            <style>
+        .med-ack.en .ack-box{
+          width:70%;
+          margin:0 0 8px 0;
+          margin-left:auto;                 /* push to the RIGHT to mirror Arabic */
+          border:1px solid #3b82f6;
+          border-radius:6px;
+          padding:10px 12px;
+          background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+          direction:ltr; text-align:left;
+        }
+        .med-ack.en .ack-text{ font-weight:700; line-height:1.5; margin-bottom:8px; font-size:12px; }
+        .med-ack.en .ack-row{ display:flex; align-items:center; gap:8px; }
+        .med-ack.en .ack-label{ font-weight:700; white-space:nowrap; font-size:12px; }
+        .med-ack.en .ack-line{ flex:1; height:18px; display:block; border-bottom:1px dashed #9ca3af; }
+        .med-ack.en .med-divider{ height:2px; background:#7c1d2c; }
+        @media print { .med-ack.en .ack-line{ height:16px; } }
+            </style>
+
+            <div class="ack-box">
+                <div class="ack-text">I, the above-named student, confirm that the information in this form is correct.</div>
+                <div class="ack-row">
+                    <span class="ack-label">Signature:</span>
+                    <span class="ack-line"></span>
+                </div>
+            </div>
+
+            <div class="med-divider"></div>
+        </div>
+
+    </div>
+</div>
+
+<!-- Footer Information -->
+<div class="footer-info">
+    <div>
+        <strong>أعدّها — Prepared by:</strong>
+        <span t-esc="(o.create_uid and o.create_uid.name) or (user and user.name) or '-'"/>
+    </div>
+    <div>
+        <strong>تاريخ الطباعة — Printed on:</strong>
+        <span t-out="o.write_date or o.create_date" t-options='{"widget":"datetime"}'/>
+    </div>
+</div>
+</t>
+</template>
+
+<!-- Note: if company header still shows, set External Report Layout to Minimal in Company settings,
+         or we can add a targeted inherit once we confirm the exact DOM in your Odoo 17 theme. -->
+
+</odoo>

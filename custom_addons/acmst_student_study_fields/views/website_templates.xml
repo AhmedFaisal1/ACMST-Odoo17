@@ -1,0 +1,358 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="view_e_learning_registration_form" model="ir.ui.view">
+            <field name="name">E-Learning Registration Form</field>
+            <field name="type">qweb</field>
+            <field name="key">acmst_student_study_fields.e_learning_registration_form</field>
+            <field name="arch" type="xml">
+                <t t-name="acmst_student_study_fields.e_learning_registration_form">
+                    <t t-call="website.layout">
+                        <style>
+  /* Space between sticky header and page content */
+  header + #wrap,
+  .o_header_affix ~ #wrap,
+  .o_header_is_scrolled ~ #wrap {
+    padding-top: 40px !important;
+  }
+  /* Avoid collapsed margin on first heading */
+  #wrap h1:first-child, #wrap h2:first-child, #wrap h3:first-child {
+    margin-top: 0 !important;
+  }
+
+  /* Form rhythm + submit spacing */
+  form.o_mark_required .form-group { margin-bottom: 16px !important; }
+  .submit-spacer { margin-top: 28px !important; margin-bottom: 12px !important; }
+
+  /* Instructions card (clean) */
+  .instructions-card{
+    background:#e9f7fb;border:1px solid #cfe9f3;border-radius:12px;
+    padding:18px 20px;margin:20px 0 28px 0;
+  }
+  .instructions-header{display:flex;align-items:center;gap:10px;font-weight:600;color:#0b6d7a;margin-bottom:8px;}
+  .instructions-header .fa{font-size:18px;}
+  .instructions-body{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+  .instructions-col{background:#fff;border-radius:10px;padding:14px 16px;border-left:4px solid #0b6d7a14;}
+  .instructions-col.ltr{direction:ltr;text-align:left;}
+  .instructions-col.rtl{direction:rtl;text-align:right;}
+  .instructions-col .lead{margin:0 0 6px 0;font-weight:600;}
+  .instructions-col .list{margin:0;padding-left:18px;}
+  .instructions-col.rtl .list{padding-right:18px;padding-left:0;}
+  @media (max-width: 767px){ .instructions-body{grid-template-columns:1fr;} }
+                        </style>
+
+                        <div id="wrap">
+                            <div class="container">
+                                <div class="row">
+                                    <div class="col-md-8 col-md-offset-2">
+                                        <div class="panel panel-default">
+                                            <div class="panel-heading">
+                                                <h3 class="panel-title">E-Learning Registration</h3>
+                                            </div>
+                                            <div class="panel-body">
+                                                <form action="/website/form/acmst.student.study.fields" method="post" enctype="multipart/form-data" class="o_mark_required" data-success-mode="redirect" data-success-page="/e-learning-registration-success">
+                                                    <div class="instructions-card">
+                                                        <div class="instructions-card">
+                                                            <div class="instructions-header">
+                                                                <i class="fa fa-info-circle"></i>
+                                                                <span>Instructions / التعليمات</span>
+                                                            </div>
+
+                                                            <div class="instructions-body">
+                                                                <div class="instructions-col ltr">
+                                                                    <p class="lead">Please follow these steps:</p>
+                                                                    <ul class="list">
+                                                                        <li>Select your desired program or online course.</li>
+                                                                        <li>Fill in your contact details below.</li>
+                                                                        <li>Submit the form — our team will contact you with schedules and details.</li>
+                                                                    </ul>
+                                                                </div>
+
+                                                                <div class="instructions-col rtl">
+                                                                    <p class="lead">الرجاء اتباع الخطوات التالية:</p>
+                                                                    <ul class="list">
+                                                                        <li>اختر التخصص أو الدورة التدريبية المناسبة لك.</li>
+                                                                        <li>أدخل بيانات التواصل المطلوبة أدناه.</li>
+                                                                        <li>أرسل النموذج — سيتواصل معك فريقنا بالمواعيد وكافة التفاصيل.</li>
+                                                                    </ul>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label for="your_name">Your Name *</label>
+                                                        <input type="text" class="form-control" id="your_name" name="your_name" required="required"/>
+                                                    </div>
+
+                                                    <div class="form-group">
+                                                        <label for="phone_number">Phone Number * <small class="text-muted">(include country code, e.g. +249)</small>
+                                                        </label>
+                                                        <input type="tel" class="form-control" id="phone_number" name="phone_number" placeholder="+971 50 123 4567" pattern="^\+\d{7,15}$" title="Include country code, e.g. +971501234567" required="required"/>
+                                                    </div>
+
+                                                    <div class="form-group">
+                                                        <label for="whatsapp">WhatsApp * <small class="text-muted">(include country code, e.g. +249)</small>
+                                                        </label>
+                                                        <input type="tel" class="form-control" id="whatsapp" name="whatsapp" placeholder="+971 50 123 4567" pattern="^\+\d{7,15}$" title="Include country code, e.g. +971501234567" required="required"/>
+                                                    </div>
+
+                                                    <div class="form-group">
+                                                        <label for="your_email">Your Email *</label>
+                                                        <input type="email" class="form-control" id="your_email" name="your_email" required="required"/>
+                                                    </div>
+
+                                                    <div class="form-group">
+                                                        <label for="fields">Fields *</label>
+                                                        <select class="form-control" id="fields" name="fields" required="required">
+                                                            <option value="">Select a field of interest / اختر التخصص</option>
+
+                                                            <option value="الطب والجراحة — Medicine and Surgery">الطب والجراحة — Medicine and Surgery</option>
+                                                            <option value="طب وجراحة الأسنان — Dentistry (Oral and Maxillofacial Surgery)">طب وجراحة الأسنان — Dentistry (Oral and Maxillofacial Surgery)</option>
+                                                            <option value="الصيدلة — Pharmacy">الصيدلة — Pharmacy</option>
+                                                            <option value="علوم المختبرات الطبية — Medical Laboratory Sciences">علوم المختبرات الطبية — Medical Laboratory Sciences</option>
+                                                            <option value="التمريض — Nursing">التمريض — Nursing</option>
+                                                            <option value="الهندسة الميكانيكية — Mechanical Engineering">الهندسة الميكانيكية — Mechanical Engineering</option>
+                                                            <option value="تقنية المعلومات — Information Technology">تقنية المعلومات — Information Technology</option>
+                                                            <option value="الذكاء الاصطناعي — Artificial Intelligence (AI)">الذكاء الاصطناعي — Artificial Intelligence (AI)</option>
+                                                            <option value="الشبكات — Networks">الشبكات — Networks</option>
+                                                            <option value="تحليل البيانات — Data Analysis">تحليل البيانات — Data Analysis</option>
+                                                            <option value="الترجمة — Translation">الترجمة — Translation</option>
+                                                            <option value="اللغات — Languages">اللغات — Languages</option>
+                                                            <option value="المحاسبة والإدارة — Accounting and Management">المحاسبة والإدارة — Accounting and Management</option>
+                                                        </select>
+                                                    </div>
+                                                    <style>
+  /* restore spacing in website forms even if theme overrides it */
+  form.o_mark_required .form-group { margin-bottom: 16px !important; }
+  form.o_mark_required .form-group.submit-spacer { margin-top: 40px !important; }
+                                                    </style>
+
+                                                    <div class="form-group submit-spacer">
+                                                        <button type="submit" class="btn btn-primary">Submit</button>
+                                                    </div>
+
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </t>
+            </field>
+        </record>
+
+        <record id="view_e_learning_registration_success" model="ir.ui.view">
+            <field name="name">E-Learning Registration Success</field>
+            <field name="type">qweb</field>
+            <field name="key">acmst_student_study_fields.e_learning_registration_success</field>
+            <field name="arch" type="xml">
+                <t t-name="acmst_student_study_fields.e_learning_registration_success">
+                    <t t-call="website.layout">
+                        <style>
+      .reg-success-wrap{padding:48px 0}
+      .reg-success-card{max-width:720px;margin:0 auto;text-align:center;padding:32px 24px;border-radius:14px;background:#fff;box-shadow:0 10px 30px rgba(0,0,0,.06)}
+      .reg-success-icon{font-size:56px}
+      .reg-success-icon .ok{color:#28a745}
+      .reg-success-title{font-size:28px;font-weight:700;margin:12px 0 8px}
+      .reg-success-text{font-size:16px;color:#555;margin:0}
+      .reg-success-actions{margin-top:20px}
+                        </style>
+
+                        <div id="wrap">
+                            <div class="container reg-success-wrap">
+                                <div class="reg-success-card">
+                                    <div class="reg-success-icon">
+                                        <i class="fa fa-check-circle ok"></i>
+                                    </div>
+                                    <div class="reg-success-title">Registration Successful</div>
+                                    <p class="reg-success-text">Thank you! Your request was submitted. Our team will contact you soon.</p>
+                                    <div class="reg-success-actions">
+                                        <a href="/" class="btn btn-primary">Back to Home</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </t>
+            </field>
+        </record>
+
+        <!-- Volunteering & Charity Registration Form -->
+        <record id="view_volunteering_charity_form" model="ir.ui.view">
+            <field name="name">Volunteering &amp; Charity Registration Form</field>
+            <field name="type">qweb</field>
+            <field name="key">acmst_student_study_fields.volunteering_charity_form</field>
+            <field name="arch" type="xml">
+                <t t-name="acmst_student_study_fields.volunteering_charity_form">
+                    <t t-call="website.layout">
+                        <style>
+  /* Space between sticky header and page content */
+  header + #wrap,
+  .o_header_affix ~ #wrap,
+  .o_header_is_scrolled ~ #wrap {
+    padding-top: 40px !important;
+  }
+  /* Avoid collapsed margin on first heading */
+  #wrap h1:first-child, #wrap h2:first-child, #wrap h3:first-child {
+    margin-top: 0 !important;
+  }
+
+  /* Form rhythm + submit spacing */
+  form.o_mark_required .form-group { margin-bottom: 16px !important; }
+  .submit-spacer { margin-top: 28px !important; margin-bottom: 12px !important; }
+
+  /* Instructions card (clean) */
+  .instructions-card{
+    background:#e9f7fb;border:1px solid #cfe9f3;border-radius:12px;
+    padding:18px 20px;margin:20px 0 28px 0;
+  }
+  .instructions-header{display:flex;align-items:center;gap:10px;font-weight:600;color:#0b6d7a;margin-bottom:8px;}
+  .instructions-header .fa{font-size:18px;}
+  .instructions-body{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+  .instructions-col{background:#fff;border-radius:10px;padding:14px 16px;border-left:4px solid #0b6d7a14;}
+  .instructions-col.ltr{direction:ltr;text-align:left;}
+  .instructions-col.rtl{direction:rtl;text-align:right;}
+  .instructions-col .lead{margin:0 0 6px 0;font-weight:600;}
+  .instructions-col .list{margin:0;padding-left:18px;}
+  .instructions-col.rtl .list{padding-right:18px;padding-left:0;}
+  @media (max-width: 767px){ .instructions-body{grid-template-columns:1fr;} }
+                        </style>
+
+                        <div id="wrap">
+                            <div class="container">
+                                <div class="row">
+                                    <div class="col-md-8 col-md-offset-2">
+                                        <div class="panel panel-default">
+                                            <div class="panel-heading">
+                                                <h3 class="panel-title">Volunteering &amp; Charity</h3>
+                                            </div>
+                                            <div class="panel-body">
+                                                <form action="/website/form/acmst.student.study.fields" method="post" enctype="multipart/form-data" class="o_mark_required" data-success-mode="redirect" data-success-page="/volunteering-charity-success">
+                                                    <div class="instructions-card">
+                                                        <div class="instructions-card">
+                                                            <div class="instructions-header">
+                                                                <i class="fa fa-info-circle"></i>
+                                                                <span>Instructions / التعليمات</span>
+                                                            </div>
+
+                                                            <div class="instructions-body">
+                                                                <div class="instructions-col ltr">
+                                                                    <p class="lead">Please follow these steps:</p>
+                                                                    <ul class="list">
+                                                                        <li>Select your preferred volunteering activity.</li>
+                                                                        <li>Fill in your contact details below.</li>
+                                                                        <li>Submit the form — our team will contact you with schedules and details.</li>
+                                                                    </ul>
+                                                                </div>
+
+                                                                <div class="instructions-col rtl">
+                                                                    <p class="lead">الرجاء اتباع الخطوات التالية:</p>
+                                                                    <ul class="list">
+                                                                        <li>اختر النشاط التطوعي المناسب لك.</li>
+                                                                        <li>أدخل بيانات التواصل المطلوبة أدناه.</li>
+                                                                        <li>أرسل النموذج — سيتواصل معك فريقنا بالمواعيد وكافة التفاصيل.</li>
+                                                                    </ul>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label for="your_name">Your Name *</label>
+                                                        <input type="text" class="form-control" id="your_name" name="your_name" required="required"/>
+                                                    </div>
+
+                                                    <div class="form-group">
+                                                        <label for="phone_number">Phone Number * <small class="text-muted">(include country code, e.g. +249)</small>
+                                                        </label>
+                                                        <input type="tel" class="form-control" id="phone_number" name="phone_number" placeholder="+971 50 123 4567" pattern="^\+\d{7,15}$" title="Include country code, e.g. +971501234567" required="required"/>
+                                                    </div>
+
+                                                    <div class="form-group">
+                                                        <label for="whatsapp">WhatsApp * <small class="text-muted">(include country code, e.g. +249)</small>
+                                                        </label>
+                                                        <input type="tel" class="form-control" id="whatsapp" name="whatsapp" placeholder="+971 50 123 4567" pattern="^\+\d{7,15}$" title="Include country code, e.g. +971501234567" required="required"/>
+                                                    </div>
+
+                                                    <div class="form-group">
+                                                        <label for="your_email">Your Email *</label>
+                                                        <input type="email" class="form-control" id="your_email" name="your_email" required="required"/>
+                                                    </div>
+
+                                                    <div class="form-group">
+                                                        <label for="fields">Volunteering Activities *</label>
+                                                        <select class="form-control" id="fields" name="fields" required="required">
+                                                            <option value="">Select a volunteering activity / اختر النشاط التطوعي</option>
+                                                            <option value="التنظيم">التنظيم</option>
+                                                            <option value="أعمال نظافة">أعمال نظافة</option>
+                                                            <option value="أعمال صحة">أعمال صحة</option>
+                                                            <option value="إطعام">إطعام</option>
+                                                            <option value="تنظيم الفعاليات">تنظيم الفعاليات</option>
+                                                            <option value="تنظيم الطابور والمواصلات">تنظيم الطابور والمواصلات</option>
+                                                            <option value="حملة نظافة أسبوعية">حملة نظافة أسبوعية</option>
+                                                            <option value="تشجير وتجميل">تشجير وتجميل</option>
+                                                            <option value="يوم صحي وتبرع بالدم">يوم صحي وتبرع بالدم</option>
+                                                            <option value="سقيا ووجبات خفيفة">سقيا ووجبات خفيفة</option>
+                                                        </select>
+                                                    </div>
+                                                    <style>
+  /* restore spacing in website forms even if theme overrides it */
+  form.o_mark_required .form-group { margin-bottom: 16px !important; }
+  form.o_mark_required .form-group.submit-spacer { margin-top: 40px !important; }
+                                                    </style>
+
+                                                    <div class="form-group submit-spacer">
+                                                        <button type="submit" class="btn btn-primary">Submit</button>
+                                                    </div>
+
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </t>
+            </field>
+        </record>
+
+        <!-- Volunteering & Charity Success Page -->
+        <record id="view_volunteering_charity_success" model="ir.ui.view">
+            <field name="name">Volunteering &amp; Charity Success</field>
+            <field name="type">qweb</field>
+            <field name="key">acmst_student_study_fields.volunteering_charity_success</field>
+            <field name="arch" type="xml">
+                <t t-name="acmst_student_study_fields.volunteering_charity_success">
+                    <t t-call="website.layout">
+                        <style>
+      .reg-success-wrap{padding:48px 0}
+      .reg-success-card{max-width:720px;margin:0 auto;text-align:center;padding:32px 24px;border-radius:14px;background:#fff;box-shadow:0 10px 30px rgba(0,0,0,.06)}
+      .reg-success-icon{font-size:56px}
+      .reg-success-icon .ok{color:#28a745}
+      .reg-success-title{font-size:28px;font-weight:700;margin:12px 0 8px}
+      .reg-success-text{font-size:16px;color:#555;margin:0}
+      .reg-success-actions{margin-top:20px}
+                        </style>
+
+                        <div id="wrap">
+                            <div class="container reg-success-wrap">
+                                <div class="reg-success-card">
+                                    <div class="reg-success-icon">
+                                        <i class="fa fa-check-circle ok"></i>
+                                    </div>
+                                    <div class="reg-success-title">Volunteering Registration Successful</div>
+                                    <p class="reg-success-text">Thank you! Your volunteering request was submitted. Our team will contact you soon.</p>
+                                    <div class="reg-success-actions">
+                                        <a href="/" class="btn btn-primary">Back to Home</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </t>
+            </field>
+        </record>
+    </data>
+</odoo>

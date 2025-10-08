@@ -1,0 +1,51 @@
+<odoo>
+    <record id="view_student_study_fields_tree" model="ir.ui.view">
+        <field name="name">student.study.fields.tree</field>
+        <field name="model">acmst.student.study.fields</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name"/>
+                <field name="email"/>
+                <field name="phone"/>
+                <field name="whatsapp"/>
+                <field name="field_of_interest_id"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_student_study_fields_form" model="ir.ui.view">
+        <field name="name">student.study.fields.form</field>
+        <field name="model">acmst.student.study.fields</field>
+        <field name="arch" type="xml">
+            <form string="Student Study Field">
+                <sheet>
+                    <group>
+                        <field name="name"/>
+                        <field name="phone"/>
+                        <field name="whatsapp"/>
+                        <field name="email"/>
+                        <field name="field_of_interest_id"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_student_study_fields" model="ir.actions.act_window">
+        <field name="name">Student Study Fields</field>
+        <field name="res_model">acmst.student.study.fields</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <!-- Volunteer Applications Action -->
+    <record id="action_volunteer_applications" model="ir.actions.act_window">
+        <field name="name">Volunteer Applications</field>
+        <field name="res_model">acmst.student.study.fields</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[('field_of_interest_id.name', 'in', ['التنظيم', 'أعمال نظافة', 'أعمال صحة', 'إطعام', 'تنظيم الفعاليات', 'تنظيم الطابور والمواصلات', 'حملة نظافة أسبوعية', 'تشجير وتجميل', 'يوم صحي وتبرع بالدم', 'سقيا ووجبات خفيفة'])]</field>
+        <field name="context">{'search_default_volunteer_applications': 1}</field>
+    </record>
+
+    <menuitem id="menu_student_study_fields" name="Student Registrations" parent="menu_acmst_root" action="action_student_study_fields"/>
+    <menuitem id="menu_volunteer_applications" name="Volunteer Applications" parent="menu_acmst_root" action="action_volunteer_applications"/>
+</odoo>

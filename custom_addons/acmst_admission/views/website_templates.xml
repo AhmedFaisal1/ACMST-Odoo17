@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <template id="lookup" name="Admissions Lookup Page">
+            <t t-call="website.layout">
+                <div class="container">
+                    <h1>Admissions Lookup</h1>
+                    <t t-if="error"><div class="alert alert-danger"><t t-esc="error"/></div></t>
+                    <t t-if="recaptcha_site_key">
+                        <script t-att-src="'https://www.google.com/recaptcha/api.js?hl=ar'" async="true" defer="true"></script>
+                    </t>
+                    <form method="post">
+                        <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                        <div class="row g-2">
+                            <div class="col"><input class="form-control" name="first_ar" placeholder="First (AR)"/></div>
+                            <div class="col"><input class="form-control" name="second_ar" placeholder="Second (AR)"/></div>
+                            <div class="col"><input class="form-control" name="third_ar" placeholder="Third (AR)"/></div>
+                            <div class="col"><input class="form-control" name="fourth_ar" placeholder="Fourth (AR)"/></div>
+                        </div>
+                        <div class="row g-2 mt-2">
+                            <div class="col">
+                                <select class="form-select" name="program_code">
+                                    <option value="">Select Program</option>
+                                    <t t-foreach="programs" t-as="p">
+                                        <option t-att-value="p.code"><t t-esc="p.name or p.code"/></option>
+                                    </t>
+                                </select>
+                            </div>
+                            <div class="col">
+                                <select class="form-select" name="year_code">
+                                    <option value="">Select Year</option>
+                                    <t t-foreach="years" t-as="y"><option t-att-value="y.code"><t t-esc="y.name or y.code"/></option></t>
+                                </select>
+                            </div>
+                        </div>
+                        <t t-if="recaptcha_site_key"><div class="g-recaptcha mt-2" t-att-data-sitekey="recaptcha_site_key"></div></t>
+                        <button type="submit" class="btn btn-primary mt-3">Search</button>
+                    </form>
+                    <t t-if="results">
+                        <h3 class="mt-4">Results</h3>
+                        <ul>
+                            <t t-foreach="results" t-as="r">
+                                <li>
+                                    ID <t t-esc="r['uid']"/> — <t t-esc="r['name_ar']"/>
+                                    <a t-att-href="'/admissions/use_id?id=%s' % r['id']" class="btn btn-link">Use this ID</a>
+                                </li>
+                            </t>
+                        </ul>
+                    </t>
+                </div>
+            </t>
+        </template>
+
+        <template id="auth" name="Admissions Auth Page">
+            <t t-call="website.layout">
+                <div class="container">
+                    <h1>Admissions Auth</h1>
+                    <t t-if="error"><div class="alert alert-danger"><t t-esc="error"/></div></t>
+                    <t t-if="recaptcha_site_key">
+                        <script t-att-src="'https://www.google.com/recaptcha/api.js?hl=ar'" async="true" defer="true"></script>
+                    </t>
+                    <form method="post">
+                        <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                        <input class="form-control" name="university_id" placeholder="University ID" t-att-value="university_id or ''"/>
+                        <t t-if="recaptcha_site_key"><div class="g-recaptcha mt-2" t-att-data-sitekey="recaptcha_site_key"></div></t>
+                        <button type="submit" class="btn btn-primary mt-2">Continue</button>
+                    </form>
+                </div>
+            </t>
+        </template>
+
+        <template id="phone" name="Admissions Phone Page">
+            <t t-call="website.layout">
+                <div class="container">
+                    <h1>Verify Phone</h1>
+                    <t t-if="error"><div class="alert alert-danger"><t t-esc="error"/></div></t>
+                    <t t-if="recaptcha_site_key">
+                        <script t-att-src="'https://www.google.com/recaptcha/api.js?render=' + recaptcha_site_key" async="true" defer="true"></script>
+                    </t>
+                    <div>
+                        <input class="form-control" name="phone" placeholder="Phone number"/>
+                    </div>
+                    <div class="mt-3">
+                        <button id="btn_send_whatsapp" class="btn btn-secondary" t-att-data-sitekey="recaptcha_site_key">Send via WhatsApp</button>
+                    </div>
+                    <div class="mt-3">
+                        <input id="otp_code" class="form-control" placeholder="Enter OTP"/>
+                        <button id="btn_verify_otp" class="btn btn-success mt-2" t-att-data-sitekey="recaptcha_sitekey">Verify</button>
+                    </div>
+                </div>
+            </t>
+        </template>
+
+        <template id="profile" name="Admissions Profile Page">
+            <t t-call="website.layout">
+                <div class="container">
+                    <h1>Admissions Profile</h1>
+                    <t t-if="cand">
+                        <p>University ID: <t t-esc="cand.combined_university_id"/></p>
+                        <form method="post">
+                            <div class="row g-2">
+                                <div class="col"><input class="form-control" name="first_ar" t-att-value="cand.first_ar or ''" placeholder="First (AR)"/></div>
+                                <div class="col"><input class="form-control" name="second_ar" t-att-value="cand.second_ar or ''" placeholder="Second (AR)"/></div>
+                                <div class="col"><input class="form-control" name="third_ar" t-att-value="cand.third_ar or ''" placeholder="Third (AR)"/></div>
+                                <div class="col"><input class="form-control" name="fourth_ar" t-att-value="cand.fourth_ar or ''" placeholder="Fourth (AR)"/></div>
+                            </div>
+                            <button type="submit" class="btn btn-primary mt-3">Save</button>
+                        </form>
+                        <div class="mt-3">
+                            <a class="btn btn-outline-secondary" href="/admissions/report">Download Admission Form (PDF)</a>
+                            <a class="btn btn-outline-secondary ms-2" href="/admissions/report/embassy">Download Embassy Form (PDF)</a>
+                        </div>
+                    </t>
+                </div>
+            </t>
+        </template>
+    </data>
+</odoo>
