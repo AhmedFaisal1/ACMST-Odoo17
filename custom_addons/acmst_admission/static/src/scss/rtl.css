@@ -1,4 +1,0 @@
-/* Basic RTL and Arabic-friendly font stack for website pages */
-html[dir='rtl'] body, [dir='rtl'] body { direction: rtl; }
-body { font-family: 'Cairo', 'Amiri', 'Noto Naskh Arabic', Tahoma, Arial, sans-serif; }
-

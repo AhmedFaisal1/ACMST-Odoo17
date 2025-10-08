@@ -1,4 +1,0 @@
-id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
-access_acmst_student_user,acmst.student,model_acmst_student,base.group_user,1,1,1,1
-access_acmst_enrollment_user,acmst.enrollment,model_acmst_enrollment,base.group_user,1,1,1,1
-access_acmst_student_import_wizard,acmst.student.import.wizard,model_acmst_student_import_wizard,base.group_user,1,1,1,1
